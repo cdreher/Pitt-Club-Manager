@@ -1,0 +1,23 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pitt-Club-Manager", "Pitt-Club-Manager.csproj", "{98C0437C-CE2C-40A1-B492-3EA146EE9416}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pitt-Club-Manager.Tests", "Pitt-Club-Manager.Tests\Pitt-Club-Manager.Tests.csproj", "{0C2797FA-37E2-47AA-B09F-E09D48DA0731}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{98C0437C-CE2C-40A1-B492-3EA146EE9416}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98C0437C-CE2C-40A1-B492-3EA146EE9416}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98C0437C-CE2C-40A1-B492-3EA146EE9416}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98C0437C-CE2C-40A1-B492-3EA146EE9416}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C2797FA-37E2-47AA-B09F-E09D48DA0731}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C2797FA-37E2-47AA-B09F-E09D48DA0731}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C2797FA-37E2-47AA-B09F-E09D48DA0731}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C2797FA-37E2-47AA-B09F-E09D48DA0731}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
