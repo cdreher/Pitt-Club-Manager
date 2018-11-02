@@ -1,0 +1,21 @@
+﻿<h2>Hello, club page!</h2>
+<h3>Name: @Model.GetName() - id: @Model.GetId()</h3>
+<div>Manager: @Model.GetManager().GetFirstName() @Model.GetManager().GetLastName()</div>
+<div id="members">
+    Members
+    <ul>
+        @foreach (var member in Model.GetMembers())
+        {
+            <li>@member.GetFirstName() @member.GetLastName()</li>
+        }
+    </ul>
+</div>
+
+<div id="events">
+    Events
+    <ul>
+        @foreach (var e in Model.GetEvents()) {
+            <li>@e.GetId() - @e.GetName() - @e.GetDescription() - @e.GetStart() </li>
+        }
+    </ul>
+</div>
