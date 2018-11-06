@@ -3,12 +3,12 @@ namespace PittClubManager.Models
 {
     public class Event
     {
-        private int id;
+        private string id;
         private DateTime start;
         private string name;
         private string description;
 
-        public Event(int id, DateTime start, string name, string description)
+        public Event(string id, DateTime start, string name, string description)
         {
             this.id = id;
             this.start = start;
@@ -16,11 +16,11 @@ namespace PittClubManager.Models
             this.description = description;
         }
 
-        public int GetId() {
+        public string GetId() {
             return id;
         }
 
-        public void SetId(int id) {
+        public void SetId(string id) {
             this.id = id;
         }
 
