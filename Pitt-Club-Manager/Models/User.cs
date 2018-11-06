@@ -3,13 +3,13 @@ namespace PittClubManager.Models
 {
     public class User
     {
-        private int uid;
+        private string id;
         private string firstName;
         private string lastName;
 
-        public User(int uid, string firstName, string lastName)
+        public User(string id, string firstName, string lastName)
         {
-            this.uid = uid;
+            this.id = id;
             this.firstName = firstName;
             this.lastName = lastName;
         }
