@@ -3,7 +3,7 @@ namespace PittClubManager.Models
 {
     public class Club
     {
-        private int id;
+        private string id;
         private string name;
         private User manager;
         private User[] members;
@@ -15,11 +15,11 @@ namespace PittClubManager.Models
             this.events = new Event[0];
         }
 
-        public int GetId() {
+        public string GetId() {
             return id;
         }
 
-        public void SetId(int id) {
+        public void SetId(string id) {
             this.id = id;
         }
 

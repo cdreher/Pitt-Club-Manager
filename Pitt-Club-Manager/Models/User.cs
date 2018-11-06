@@ -13,14 +13,34 @@ namespace PittClubManager.Models
             this.firstName = firstName;
             this.lastName = lastName;
         }
+
         public string GetFirstName()
         {
             return firstName;
+        }
+
+        public void SetFirstName(string firstName)
+        {
+            this.firstName = firstName;
         }
 
         public string GetLastName()
         {
             return lastName;
         }
+
+        public void SetLastName(string lastName)
+        {
+            this.lastName = lastName;
+        }
+
+        public string GetId() {
+            return id;
+        }
+       
+        public void SetId(string id) {
+            this.id = id;
+        }
+
     }
 }
