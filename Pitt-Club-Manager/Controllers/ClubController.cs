@@ -46,14 +46,13 @@ namespace PittClubManager.Controllers
         public ActionResult Id(int id)
         {
             // todo: this should eventually fetch the club from the db by id
-            
             String s = Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS");
             GrpcEnvironment.SetLogger(new ConsoleLogger());
-            Console.WriteLine("Environment var: " + s);
+            System.Diagnostics.Debug.WriteLine("Environment var: " + s);
 
             //Models.User user = FirebaseHelper.GetUser("SAMPLE_USER").Result;
             var c = FirebaseHelper.GetClub("SAMPLE_CLUB").Result;
-            return View("Id", new Club());
+            return View("Id", c);
         }
     }
 }

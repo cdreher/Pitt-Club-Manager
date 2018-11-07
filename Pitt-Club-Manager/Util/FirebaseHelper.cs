@@ -22,6 +22,7 @@ namespace PittClubManager.Util
         {
             FirebaseClient firebase = new FirebaseClient("https://pitt-club-manager.firebaseio.com");
             var authProvider = new FirebaseAuthProvider(new FirebaseConfig(WEB_KEY));
+            Club club = new Club();
             await authProvider.SignInWithEmailAndPasswordAsync(EMAIL, PASSWORD).ContinueWith(async task =>
             {
                 if (task.IsCanceled)
@@ -39,8 +40,15 @@ namespace PittClubManager.Util
                 DocumentReference docRef = db.Collection("clubs").Document(id);
                 DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
                 var exists = snapshot.Exists;
-            });
-            return null;
+                if (exists)
+                {
+                    System.Diagnostics.Debug.WriteLine("Club exists!");
+                    club.SetId("Id1");
+                    club.SetName("Test club");
+                    club.SetManager(new Models.User("100", "David", "Dimond"));
+                }
+            }).ConfigureAwait(false);
+            return club;
 
         }
 
