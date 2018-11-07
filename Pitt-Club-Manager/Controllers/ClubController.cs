@@ -7,6 +7,8 @@ using System.Web.Mvc;
 using Firebase.Auth;
 using Firebase.Database;
 using Google.Cloud.Firestore;
+using Grpc.Core;
+using Grpc.Core.Logging;
 using PittClubManager.Models;
 using PittClubManager.Util;
 
@@ -25,9 +27,15 @@ namespace PittClubManager.Controllers
         public ActionResult Id(int id)
         {
             // todo: this should eventually fetch the club from the db by id
+
+
+            String s = Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS");
+            GrpcEnvironment.SetLogger(new ConsoleLogger());
+            Console.WriteLine("Environment var: " + s);
+
             Models.User user = FirebaseHelper.GetUser("SAMPLE_USER").Result;
 
             return View("Id", null);
         }
-            }
+    }
 }
