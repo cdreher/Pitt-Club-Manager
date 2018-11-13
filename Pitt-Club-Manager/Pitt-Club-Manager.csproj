@@ -148,6 +148,7 @@
     <Folder Include="Views\Club\" />
     <Folder Include="Club_logos\" />
     <Folder Include="Util\" />
+    <Folder Include="Views\Login\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\HomeController.cs" />
@@ -161,6 +162,7 @@
     <Compile Include="Models\UserPermission.cs" />
     <Compile Include="Models\Event.cs" />
     <Compile Include="Util\FirebaseHelper.cs" />
+    <Compile Include="Controllers\LoginController.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Web.config" />
@@ -199,6 +201,8 @@
     <Content Include="Scripts\esm\popper.js" />
     <Content Include="Scripts\esm\popper-utils.min.js" />
     <Content Include="Scripts\esm\popper-utils.js" />
+    <Content Include="Views\Login\Index.cshtml" />
+    <Content Include="Content\login-register.css" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\bootstrap.min.js.map" />
