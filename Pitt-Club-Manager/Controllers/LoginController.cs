@@ -56,7 +56,7 @@ namespace PittClubManager.Controllers
 
 
             });
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(500); // Needed for SignInWithEmailAndPasswordAsync to finish
 
             if (user.GetId().Equals("###"))
             {
@@ -70,7 +70,14 @@ namespace PittClubManager.Controllers
         public ActionResult Register(FormCollection formCollection)
         {
             _email = formCollection["register-email"];
-            _password = formCollection["confirm-password"];
+            _password = formCollection["register-password"];
+            var confirm_password = formCollection["confirm-password"];
+
+            if(!(_password.Equals(confirm_password)))
+            {
+                TempData["InvalidRegistration"] = true;
+                return RedirectToAction("Index", "Login");            
+            }
 
             firebase = new FirebaseClient("https://pitt-club-manager.firebaseio.com");
             authProvider = new FirebaseAuthProvider(new FirebaseConfig("AIzaSyCN8Av2-nfNtsRdlWaZiaejPdwQ4QqA38c"));
@@ -95,7 +102,7 @@ namespace PittClubManager.Controllers
 
 
             });
-            System.Threading.Thread.Sleep(1500);
+            System.Threading.Thread.Sleep(1500); // Needed for CreateUserWithEmailAndPasswordAsync to finish
 
             if (user.GetId().Equals("###"))
             {
