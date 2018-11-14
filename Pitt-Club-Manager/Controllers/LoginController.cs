@@ -20,6 +20,10 @@ namespace PittClubManager.Controllers
             {
                 TempData["InvalidLogin"] = false;
             }
+            if (TempData["InvalidRegistration"] == null)
+            {
+                TempData["InvalidRegistration"] = false;
+            }
             return View ();
         }
 
@@ -63,8 +67,42 @@ namespace PittClubManager.Controllers
         }
 
         [HttpPost]
-        public ActionResult Register()
+        public ActionResult Register(FormCollection formCollection)
         {
+            _email = formCollection["register-email"];
+            _password = formCollection["confirm-password"];
+
+            firebase = new FirebaseClient("https://pitt-club-manager.firebaseio.com");
+            authProvider = new FirebaseAuthProvider(new FirebaseConfig("AIzaSyCN8Av2-nfNtsRdlWaZiaejPdwQ4QqA38c"));
+
+            authProvider.CreateUserWithEmailAndPasswordAsync(_email, _password).ContinueWith(task =>
+            {
+                if (task.IsCanceled)
+                {
+                    Console.WriteLine("CreateUserWithEmailAndPasswordAsync was canceled.");
+                    return;
+                }
+                if (task.IsFaulted)
+                {
+                    Console.WriteLine("CreateUserWithEmailAndPasswordAsync encountered an error: " + task.Exception);
+                    return;
+                }
+
+                FirebaseAuth newUser = task.Result;
+                Console.WriteLine("CreateUserWithEmailAndPasswordAsync success: {0}, {1}", _email, _password);
+
+                user.SetId(newUser.User.LocalId);
+
+
+            });
+            System.Threading.Thread.Sleep(1500);
+
+            if (user.GetId().Equals("###"))
+            {
+                TempData["InvalidRegistration"] = true;
+                return RedirectToAction("Index", "Login");
+            }
+
             return RedirectToAction("Index", "Home");
         }
     }
