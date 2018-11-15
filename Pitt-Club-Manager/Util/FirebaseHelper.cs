@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Firebase.Auth;
 using Firebase.Database;
@@ -38,18 +40,60 @@ namespace PittClubManager.Util
                 FirebaseAuth newUser = task.Result;
                 var db = FirestoreDb.Create("pitt-club-manager");
                 DocumentReference docRef = db.Collection("clubs").Document(id);
-                DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+                DocumentSnapshot snapshot = docRef.GetSnapshotAsync().Result; // this might be improper but I could only get to work by blocking..
+                //System.Diagnostics.Debug.WriteLine("Snapshot taken of document " + id + "!");
                 var exists = snapshot.Exists;
                 if (exists)
                 {
-                    System.Diagnostics.Debug.WriteLine("Club exists!");
+                    //System.Diagnostics.Debug.Write(snapshot.Id);
+                    //System.Diagnostics.Debug.WriteLine("Club exists!");
                     club.SetId("Id1");
                     club.SetName("Test club");
+                    club.SetManager(new Models.User("100", "David", "Dimond"));
+                    return;
+                }
+                else
+                {
+                    //System.Diagnostics.Debug.WriteLine("Club nonexistent!");
+                    club.SetId("Nonexistent");
+                    club.SetName("Nonexistent club");
                     club.SetManager(new Models.User("100", "David", "Dimond"));
                 }
             }).ConfigureAwait(false);
             return club;
 
+        }
+
+        public static async Task<ArrayList> GetClubList()
+        {
+            FirebaseClient firebase = new FirebaseClient("https://pitt-club-manager.firebaseio.com");
+            var authProvider = new FirebaseAuthProvider(new FirebaseConfig(WEB_KEY));
+            ArrayList clubList = new ArrayList();
+            await authProvider.SignInWithEmailAndPasswordAsync(EMAIL, PASSWORD).ContinueWith(async task =>
+            {
+                if (task.IsCanceled)
+                {
+                    System.Console.WriteLine("SignInWithEmailAndPasswordAsync was canceled.");
+                    return;
+                }
+                if (task.IsFaulted)
+                {
+                    System.Console.WriteLine("SignInWithEmailAndPasswordAsync encountered an error: " + task.Exception);
+                    return;
+                }
+                FirebaseAuth newUser = task.Result;
+                var db = FirestoreDb.Create("pitt-club-manager");
+                IAsyncEnumerable<DocumentSnapshot> clubRef = db.Collection("clubs").StreamAsync();
+                int i = 0;
+                var enumerator = clubRef.GetEnumerator();
+                while (await enumerator.MoveNext())
+                {
+                    System.Diagnostics.Debug.WriteLine("Found item " + i + "!");
+                    System.Diagnostics.Debug.WriteLine(enumerator.Current.Id);
+                    i++;
+                }
+            }).ConfigureAwait(false);
+            return clubList;
         }
 
         public static async Task<Models.User> GetUser(string id)
@@ -87,9 +131,12 @@ namespace PittClubManager.Util
             try
             {
                 c.SetName(snap.GetValue<string>("name"));
-                snap.GetValue<string>("managerId");
-                snap.GetValue<string[]>("memberIds");
-                snap.GetValue<string[]>("eventIds");
+                String managerId = snap.GetValue<string>("managerId");
+                String[] memberIds = snap.GetValue<string[]>("memberIds");
+                String[] eventIds = snap.GetValue<string[]>("eventIds");
+
+                Models.User manager = GetUser(managerId);
+                c.SetManager(manager);
 
             }
             catch (Exception exp)
