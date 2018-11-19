@@ -47,9 +47,7 @@ namespace PittClubManager.Util
                 {
                     //System.Diagnostics.Debug.Write(snapshot.Id);
                     //System.Diagnostics.Debug.WriteLine("Club exists!");
-                    club.SetId("Id1");
-                    club.SetName("Test club");
-                    club.SetManager(new Models.User("100", "David", "Dimond"));
+                    club = FirebaseSnapshotToClub(snapshot);
                     return;
                 }
                 else
@@ -81,22 +79,26 @@ namespace PittClubManager.Util
                     System.Console.WriteLine("SignInWithEmailAndPasswordAsync encountered an error: " + task.Exception);
                     return;
                 }
-                FirebaseAuth newUser = task.Result;
-                var db = FirestoreDb.Create("pitt-club-manager");
-                IAsyncEnumerable<DocumentSnapshot> clubRef = db.Collection("clubs").StreamAsync();
-                int i = 0;
-                var enumerator = clubRef.GetEnumerator();
-                while (await enumerator.MoveNext())
-                {
-                    System.Diagnostics.Debug.WriteLine("Found item " + i + "!");
-                    System.Diagnostics.Debug.WriteLine(enumerator.Current.Id);
-                    i++;
-                }
             }).ConfigureAwait(false);
+            var db = FirestoreDb.Create("pitt-club-manager");
+            IAsyncEnumerable<DocumentSnapshot> clubRef = db.Collection("clubs").StreamAsync();
+            int i = 0;
+            var enumerator = clubRef.GetEnumerator();
+            while (await enumerator.MoveNext())
+            {
+                //System.Diagnostics.Debug.WriteLine("Found item " + i + "!");
+                //System.Diagnostics.Debug.WriteLine(enumerator.Current.Id);
+
+                //System.Diagnostics.Debug.WriteLine("Attempting to add club " + enumerator.Current.Id + "!");
+                clubList.Add(GetClub(enumerator.Current.Id).Result);
+                //System.Diagnostics.Debug.WriteLine("Added club " + clubList[i] + "!");
+                i++;
+            }
+            System.Diagnostics.Debug.WriteLine("Returning a club list with capacity " + clubList.Capacity + "!");
             return clubList;
         }
 
-        public static async Task<Models.User> GetUser(string id)
+        public static async Task<PittClubManager.Models.User> GetUser(string id)
         {
             var authProvider = new FirebaseAuthProvider(new FirebaseConfig(WEB_KEY));
             FirebaseAuthLink res = await authProvider.SignInWithEmailAndPasswordAsync(EMAIL, PASSWORD);
@@ -130,20 +132,23 @@ namespace PittClubManager.Util
             Club c = new Club();
             try
             {
+                System.Diagnostics.Debug.WriteLine("Firebase snapshot to club!");
                 c.SetName(snap.GetValue<string>("name"));
+                c.SetId(snap.GetValue<string>("id"));
                 String managerId = snap.GetValue<string>("managerId");
-                String[] memberIds = snap.GetValue<string[]>("memberIds");
-                String[] eventIds = snap.GetValue<string[]>("eventIds");
+                //String[] memberIds = snap.GetValue<string[]>("memberIds");
+                //String[] eventIds = snap.GetValue<string[]>("eventIds");
 
-                Models.User manager = GetUser(managerId);
+                PittClubManager.Models.User manager = GetUser(managerId).Result;
                 c.SetManager(manager);
+                System.Diagnostics.Debug.WriteLine("Firebase snapshot to club 2! " + c.GetName());
 
             }
             catch (Exception exp)
             {
                 return null;
             }
-            return null;
+            return c;
         }
     }
 }

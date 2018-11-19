@@ -43,7 +43,7 @@ namespace PittClubManager.Controllers
             Console.WriteLine(html);
         }
 
-        public ActionResult Id(int id)
+        public ActionResult Id(String id)
         {
             // todo: this should eventually fetch the club from the db by id
             String s = Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS");
@@ -51,7 +51,16 @@ namespace PittClubManager.Controllers
             System.Diagnostics.Debug.WriteLine("Environment var: " + s);
 
             //Models.User user = FirebaseHelper.GetUser("SAMPLE_USER").Result;
-            var c = FirebaseHelper.GetClub("SAMPLE_CLUB").Result;
+            var c = FirebaseHelper.GetClub(id).Result;
+            /*Task<System.Collections.ArrayList> clTask = FirebaseHelper.GetClubList();
+            clTask.Wait();
+            //System.Collections.ArrayList cl = clTask.Result;
+            //System.Diagnostics.Debug.WriteLine(cl.Count);
+            for (int i = 0; i < cl.Count; i++)
+            {
+                Club cur = (PittClubManager.Models.Club)cl[i];
+                System.Diagnostics.Debug.WriteLine(cur.GetId());
+            }*/
             return View("Id", c);
         }
     }
