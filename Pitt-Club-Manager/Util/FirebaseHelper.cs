@@ -12,7 +12,8 @@ namespace PittClubManager.Util
 {
     public class FirebaseHelper
     {
-        public const string DB_NAME = "";
+        public const string FIREBASE_URL = "https://pitt-club-manager.firebaseio.com";
+        public const string DB_NAME = "pitt-club-manager";
         public const string COLLECTION_CLUBS = "clubs";
         public const string COLLECTION_USERS = "users";
 
@@ -22,7 +23,7 @@ namespace PittClubManager.Util
 
         public static async Task<Club> GetClub(string id)
         {
-            FirebaseClient firebase = new FirebaseClient("https://pitt-club-manager.firebaseio.com");
+            FirebaseClient firebase = new FirebaseClient(FIREBASE_URL);
             var authProvider = new FirebaseAuthProvider(new FirebaseConfig(WEB_KEY));
             Club club = new Club();
             await authProvider.SignInWithEmailAndPasswordAsync(EMAIL, PASSWORD).ContinueWith(async task =>
@@ -38,8 +39,8 @@ namespace PittClubManager.Util
                     return;
                 }
                 FirebaseAuth newUser = task.Result;
-                var db = FirestoreDb.Create("pitt-club-manager");
-                DocumentReference docRef = db.Collection("clubs").Document(id);
+                var db = FirestoreDb.Create(DB_NAME);
+                DocumentReference docRef = db.Collection(COLLECTION_CLUBS).Document(id);
                 DocumentSnapshot snapshot = docRef.GetSnapshotAsync().Result; // this might be improper but I could only get to work by blocking..
                 //System.Diagnostics.Debug.WriteLine("Snapshot taken of document " + id + "!");
                 var exists = snapshot.Exists;
@@ -64,7 +65,7 @@ namespace PittClubManager.Util
 
         public static async Task<ArrayList> GetClubList()
         {
-            FirebaseClient firebase = new FirebaseClient("https://pitt-club-manager.firebaseio.com");
+            FirebaseClient firebase = new FirebaseClient(FIREBASE_URL);
             var authProvider = new FirebaseAuthProvider(new FirebaseConfig(WEB_KEY));
             ArrayList clubList = new ArrayList();
             await authProvider.SignInWithEmailAndPasswordAsync(EMAIL, PASSWORD).ContinueWith(async task =>
@@ -80,8 +81,8 @@ namespace PittClubManager.Util
                     return;
                 }
             }).ConfigureAwait(false);
-            var db = FirestoreDb.Create("pitt-club-manager");
-            IAsyncEnumerable<DocumentSnapshot> clubRef = db.Collection("clubs").StreamAsync();
+            var db = FirestoreDb.Create(DB_NAME);
+            IAsyncEnumerable<DocumentSnapshot> clubRef = db.Collection(COLLECTION_CLUBS).StreamAsync();
             int i = 0;
             var enumerator = clubRef.GetEnumerator();
             while (await enumerator.MoveNext())
@@ -98,56 +99,62 @@ namespace PittClubManager.Util
             return clubList;
         }
 
-        public static async Task<PittClubManager.Models.User> GetUser(string id)
+        public static PittClubManager.Models.User[] GetUsersFromIds(string[] ids)
         {
+            FirebaseClient firebase = new FirebaseClient(FIREBASE_URL);
             var authProvider = new FirebaseAuthProvider(new FirebaseConfig(WEB_KEY));
-            FirebaseAuthLink res = await authProvider.SignInWithEmailAndPasswordAsync(EMAIL, PASSWORD);
-
-            FirebaseClient firebase = new FirebaseClient("https://pitt-club-manager.firebaseio.com", new FirebaseOptions
+            FirebaseAuthLink res = authProvider.SignInWithEmailAndPasswordAsync(EMAIL, PASSWORD).Result;
+            FirestoreDb db = FirestoreDb.Create(DB_NAME);
+            QuerySnapshot snap = db.Collection(COLLECTION_USERS).GetSnapshotAsync().Result;
+            ArrayList users = new ArrayList();
+            foreach(var doc in snap.Documents)
             {
-                AuthTokenAsyncFactory = () => Task.FromResult(res.FirebaseToken)
-            });
-            FirestoreDb db = FirestoreDb.Create("pitt-club-manager");
-            DocumentSnapshot snap = await db.Collection(COLLECTION_USERS).Document(id).GetSnapshotAsync();
-            return UserSnapshotToUser(snap);
+                foreach(var id in ids)
+                {
+                    if(id.Equals(doc.Id))
+                    {
+                        users.Add(UserSnapshotToUser(doc));
+                    }
+                }
+            }
+            return (PittClubManager.Models.User[]) users.ToArray(typeof(PittClubManager.Models.User));
         }
 
-        public static Models.User UserSnapshotToUser(DocumentSnapshot snap)
+        public static PittClubManager.Models.User GetUser(string id)
+        {
+            FirebaseClient firebase = new FirebaseClient(FIREBASE_URL);
+            var authProvider = new FirebaseAuthProvider(new FirebaseConfig(WEB_KEY));
+            FirebaseAuthLink res = authProvider.SignInWithEmailAndPasswordAsync(EMAIL, PASSWORD).Result;
+            FirestoreDb db = FirestoreDb.Create(DB_NAME);
+            DocumentSnapshot snap = db.Collection(COLLECTION_USERS).Document(id).GetSnapshotAsync().Result;
+            return (snap.Exists) ? UserSnapshotToUser(snap) : null;
+        }
+
+        private static Models.User UserSnapshotToUser(DocumentSnapshot snap)
         {
             Models.User user = new Models.User("", "", "");
-            try
-            {
-                user.SetId(snap.Id);
-                user.SetFirstName(snap.GetValue<string>("firstName"));
-                user.SetLastName(snap.GetValue<string>("lastName"));
-                return user;
-            }
-            catch (Exception exp)
-            {
-                return null;
-            }
+
+            user.SetId(snap.Id);
+            user.SetFirstName(snap.GetValue<string>("firstName"));
+            user.SetLastName(snap.GetValue<string>("lastName"));
+
+            return user;
         }
+
         private static Club FirebaseSnapshotToClub(DocumentSnapshot snap)
         {
             Club c = new Club();
-            try
-            {
-                System.Diagnostics.Debug.WriteLine("Firebase snapshot to club!");
-                c.SetName(snap.GetValue<string>("name"));
-                c.SetId(snap.GetValue<string>("id"));
-                String managerId = snap.GetValue<string>("managerId");
-                //String[] memberIds = snap.GetValue<string[]>("memberIds");
-                //String[] eventIds = snap.GetValue<string[]>("eventIds");
+            System.Diagnostics.Debug.WriteLine("Firebase snapshot to club!");
+            c.SetName(snap.GetValue<string>("name"));
+            c.SetId(snap.Id);
+            String managerId = snap.GetValue<string>("managerId");
+            //String[] eventIds = snap.GetValue<string[]>("eventIds");
+            PittClubManager.Models.User manager = GetUser(managerId);
+            c.SetManager(manager);
 
-                PittClubManager.Models.User manager = GetUser(managerId).Result;
-                c.SetManager(manager);
-                System.Diagnostics.Debug.WriteLine("Firebase snapshot to club 2! " + c.GetName());
-
-            }
-            catch (Exception exp)
-            {
-                return null;
-            }
+            string[] memberIds = snap.GetValue<string[]>("memberIds");
+            PittClubManager.Models.User[] members = GetUsersFromIds(memberIds);
+            c.SetMembers(members);
             return c;
         }
     }
