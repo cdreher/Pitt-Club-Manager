@@ -9,8 +9,7 @@ namespace PittClubManager.Models
         private User[] members;
         private Event[] events;
 
-        public Club()
-        {
+        public Club(){
             this.members = new User[0];
             this.events = new Event[0];
         }
