@@ -152,9 +152,9 @@ namespace PittClubManager.Util
             PittClubManager.Models.User manager = GetUser(managerId);
             c.SetManager(manager);
 
-            string[] memberIds = snap.GetValue<string[]>("memberIds");
+            /*string[] memberIds = snap.GetValue<string[]>("memberIds");
             PittClubManager.Models.User[] members = GetUsersFromIds(memberIds);
-            c.SetMembers(members);
+            c.SetMembers(members);*/
             return c;
         }
     }
