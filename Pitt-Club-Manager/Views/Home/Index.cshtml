@@ -64,7 +64,7 @@
                             <h2>@Model[i].GetName()</h2>
                             <p>A little description about the club.</p>
 
-                                @Html.ActionLink("Club page", "id", "Club", null, new { @class = "page-scroll" })
+                                @Html.ActionLink("Club page", "id", "Club", new { id = Model[i].GetId() }, new { @class = "page-scroll" })
 
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
