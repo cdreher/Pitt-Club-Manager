@@ -29,13 +29,13 @@
                         What are your interests?
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdown01">
-                        <p class="dropdown-item"><input type="checkbox" name="opt1" value="" />&nbsp;&nbsp;&nbsp;&nbsp;My Clubs</p>
-                        <p class="dropdown-item"><input type="checkbox" name="opt2" value="" />&nbsp;&nbsp;&nbsp;&nbsp;Sports</p>
-                        <p class="dropdown-item"><input type="checkbox" name="opt3" value="" />&nbsp;&nbsp;&nbsp;&nbsp;Gaming</p>
-                        <p class="dropdown-item"><input type="checkbox" name="opt4" value="" />&nbsp;&nbsp;&nbsp;&nbsp;Academic</p>
-                        <p class="dropdown-item"><input type="checkbox" name="opt5" value="" />&nbsp;&nbsp;&nbsp;&nbsp;Newly Added</p>
-                        <p class="dropdown-item"><input type="checkbox" name="opt6" value="" />&nbsp;&nbsp;&nbsp;&nbsp;Most members</p>
-                        <p class="dropdown-item"><input type="checkbox" name="opt7" value="" />&nbsp;&nbsp;&nbsp;&nbsp;Least members</p>
+                        <p class="dropdown-item"><input type="checkbox" id="opt1" value="My Clubs" onchange="filter(this.id, this.checked)"/>&nbsp;&nbsp;&nbsp;&nbsp;My Clubs</p>
+                        <p class="dropdown-item"><input type="checkbox" id="opt2" value="Sports" onchange="filter(this.id, this.checked)"/>&nbsp;&nbsp;&nbsp;&nbsp;Sports</p>
+                        <p class="dropdown-item"><input type="checkbox" id="opt3" value="Gaming" onchange="filter(this.id, this.checked)"/>&nbsp;&nbsp;&nbsp;&nbsp;Gaming</p>
+                        <p class="dropdown-item"><input type="checkbox" id="opt4" value="Academic" onchange="filter(this.id, this.checked)"/>&nbsp;&nbsp;&nbsp;&nbsp;Academic</p>
+                        <p class="dropdown-item"><input type="checkbox" id="opt5" value="Newly Added" onchange="filter(this.id, this.checked)"/>&nbsp;&nbsp;&nbsp;&nbsp;Newly Added</p>
+                        <p class="dropdown-item"><input type="checkbox" id="opt6" value="Most members" onchange="filter(this.id, this.checked)"/>&nbsp;&nbsp;&nbsp;&nbsp;Most members</p>
+                        <p class="dropdown-item"><input type="checkbox" id="opt7" value="Least members" onchange="filter(this.id, this.checked)"/>&nbsp;&nbsp;&nbsp;&nbsp;Least members</p>
                     </div>
                 </li>
             </ul>
@@ -54,35 +54,30 @@
         </div>
 
 
-        @{
-            for (var i = 0; i <= @ViewBag.length - 1; i++)
+        <div class="container" id="club-list">
+            @for (var i = 0; i <= @ViewBag.length - 1; i++)
             {
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-4"></div>
-                        <div class="col-md-4 card">
-                            <h2>@Model[i].GetName()</h2>
-                            <p>A little description about the club.</p>
+                <div class="col-md-4 card" style="float:left; height:350px;">
+                    <h2>@Model[i].GetName()</h2>
+                    <p style="overflow-y:scroll">@Model[i].GetDescription()</p>
+                    <p class="font-weight-bold font-italic">@Model[i].GetFilter()</p>
 
-                                @Html.ActionLink("Club page", "id", "Club", new { id = Model[i].GetId() }, new { @class = "page-scroll" })
+                    @Html.ActionLink("Club page", "id", "Club", new { id = Model[i].GetId() }, new { @class = "page-scroll" })
 
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text">
-                                        <input type="checkbox">
-                                    </div>
-                                </div>
-                                <input type="text" class="form-control" placeholder="Join @Model[i].GetName()" disabled>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox">
                             </div>
                         </div>
-                        <div class="col-md-4"></div>
+                        <input type="text" class="form-control" placeholder="Join @Model[i].GetName()" disabled>
                     </div>
                 </div>
             }
-        }
 
-        <hr>
-    </main>
+            <hr>
+        </div>
+        </main>
     <footer class="container">
         <p>CS1530 Software Engineering</p>
     </footer>
@@ -93,5 +88,28 @@
     <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
     <script src="Scripts/popper.min.js"></script>
     <script src="Scripts/bootstrap.min.js"></script>
+    <script>
+        function filter(id, vis) {
+        var input, filter, ul, li, a, i;
+        input = document.getElementById(id);
+        filter = input.value.toUpperCase();
+        ul = document.getElementById("club-list");
+        li = ul.getElementsByClassName("card");
+        for (i = 0; i < li.length; i++) {
+            a = li[i].getElementsByClassName("font-weight-bold")[0];
+            if(vis){
+                if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                li[i].style.display = "";
+                } else {
+                    li[i].style.display = "none";
+                }
+            }
+            else{
+                li[i].style.display = "";
+            }
+
+        }
+    }
+    </script>
 </body>
 </html>

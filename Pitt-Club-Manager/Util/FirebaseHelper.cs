@@ -147,6 +147,8 @@ namespace PittClubManager.Util
             System.Diagnostics.Debug.WriteLine("Firebase snapshot to club!");
             c.SetName(snap.GetValue<string>("name"));
             c.SetId(snap.Id);
+            c.SetDescription(snap.GetValue<string>("description"));
+            c.SetFilter(snap.GetValue<string>("filter"));
             String managerId = snap.GetValue<string>("managerId");
             //String[] eventIds = snap.GetValue<string[]>("eventIds");
             PittClubManager.Models.User manager = GetUser(managerId);

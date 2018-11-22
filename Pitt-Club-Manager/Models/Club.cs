@@ -5,6 +5,8 @@ namespace PittClubManager.Models
     {
         private string id;
         private string name;
+        private string description;
+        private string filter;
         private User manager;
         private User[] members;
         private Event[] events;
@@ -26,8 +28,29 @@ namespace PittClubManager.Models
             return name;
         }
 
-        public void SetName(string name) {
+        public void SetName(string name)
+        {
             this.name = name;
+        }
+
+        public string GetDescription()
+        {
+            return description;
+        }
+
+        public void SetDescription(string description)
+        {
+            this.description = description;
+        }
+
+        public string GetFilter()
+        {
+            return filter;
+        }
+
+        public void SetFilter(string filter)
+        {
+            this.filter = filter;
         }
 
         public void SetManager(User manager) {
