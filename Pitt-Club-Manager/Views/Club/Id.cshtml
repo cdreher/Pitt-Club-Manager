@@ -19,3 +19,13 @@
         }
     </ul>
 </div>
+
+<div id="memberRequests">
+	Member requests
+	<ul>
+		@foreach (var member in Model.GetMemberRequests())
+		{
+			<li>@member.GetId(): @member.GetFirstName() @member.GetLastName()</li>
+		}
+	</ul>
+</div>

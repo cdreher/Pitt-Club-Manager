@@ -144,17 +144,41 @@ namespace PittClubManager.Util
         private static Club FirebaseSnapshotToClub(DocumentSnapshot snap)
         {
             Club c = new Club();
-            System.Diagnostics.Debug.WriteLine("Firebase snapshot to club!");
             c.SetName(snap.GetValue<string>("name"));
-            c.SetId(snap.Id);
+            c.SetId(snap.GetValue<string>("id"));
             String managerId = snap.GetValue<string>("managerId");
-            //String[] eventIds = snap.GetValue<string[]>("eventIds");
+            String[] memberIds = new String[0];
+            String[] eventIds = new String[0];
+            String[] memberRequestIds = new String[0];
+            try
+            {
+                memberIds = snap.GetValue<string[]>("memberIds"); // put all of these into own try catch
+                eventIds = snap.GetValue<string[]>("eventIds");
+                memberRequestIds = snap.GetValue<string[]>("memberRequests");
+            }
+            catch (Exception e)
+            {
+            }
             PittClubManager.Models.User manager = GetUser(managerId);
+            PittClubManager.Models.User[] members = new PittClubManager.Models.User[memberIds.Length];
+            PittClubManager.Models.User[] memberRequests = new PittClubManager.Models.User[memberRequestIds.Length];
+            PittClubManager.Models.Event[] events = new PittClubManager.Models.Event[eventIds.Length];
+            for (int i = 0; i < memberIds.Length; i++)
+            {
+                members[i] = GetUser(memberIds[i]);
+            }
+            for (int i = 0; i < memberRequestIds.Length; i++)
+            {
+                memberRequests[i] = GetUser(memberRequestIds[i]);
+            }
+            for (int i = 0; i < eventIds.Length; i++)
+            {
+                //members[i] = GetEvent(eventIds[i]).Result;
+            }
             c.SetManager(manager);
-
-            /*string[] memberIds = snap.GetValue<string[]>("memberIds");
-            PittClubManager.Models.User[] members = GetUsersFromIds(memberIds);
-            c.SetMembers(members);*/
+            c.SetMembers(members);
+            //c.SetEvents(events);
+            c.SetMemberRequests(memberRequests);
             return c;
         }
     }
