@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using Firebase.Auth;
 using Firebase.Database;
@@ -28,7 +29,7 @@ namespace PittClubManager.Controllers
         }
 
         [HttpPost]
-        public ActionResult Login(FormCollection formCollection)
+        public async Task<ActionResult> Login(FormCollection formCollection)
         {
             _email = formCollection["login-email"];
             _password = formCollection["login-password"];
@@ -36,7 +37,7 @@ namespace PittClubManager.Controllers
             firebase = new FirebaseClient("https://pitt-club-manager.firebaseio.com");
             authProvider = new FirebaseAuthProvider(new FirebaseConfig("AIzaSyCN8Av2-nfNtsRdlWaZiaejPdwQ4QqA38c"));
 
-            authProvider.SignInWithEmailAndPasswordAsync(_email, _password).ContinueWith(task =>
+            await authProvider.SignInWithEmailAndPasswordAsync(_email, _password).ContinueWith(task =>
             {
                 if (task.IsCanceled)
                 {
@@ -55,8 +56,7 @@ namespace PittClubManager.Controllers
                 user.SetId(newUser.User.LocalId);
 
 
-            });
-            System.Threading.Thread.Sleep(500); // Needed for SignInWithEmailAndPasswordAsync to finish
+            }).ConfigureAwait(false);
 
             if (user.GetId().Equals("###"))
             {
@@ -67,7 +67,7 @@ namespace PittClubManager.Controllers
         }
 
         [HttpPost]
-        public ActionResult Register(FormCollection formCollection)
+        public async Task<ActionResult> Register(FormCollection formCollection)
         {
             _email = formCollection["register-email"];
             _password = formCollection["register-password"];
@@ -82,7 +82,7 @@ namespace PittClubManager.Controllers
             firebase = new FirebaseClient("https://pitt-club-manager.firebaseio.com");
             authProvider = new FirebaseAuthProvider(new FirebaseConfig("AIzaSyCN8Av2-nfNtsRdlWaZiaejPdwQ4QqA38c"));
 
-            authProvider.CreateUserWithEmailAndPasswordAsync(_email, _password).ContinueWith(task =>
+            await authProvider.CreateUserWithEmailAndPasswordAsync(_email, _password).ContinueWith(task =>
             {
                 if (task.IsCanceled)
                 {
@@ -101,8 +101,7 @@ namespace PittClubManager.Controllers
                 user.SetId(newUser.User.LocalId);
 
 
-            });
-            System.Threading.Thread.Sleep(1500); // Needed for CreateUserWithEmailAndPasswordAsync to finish
+            }).ConfigureAwait(false);
 
             if (user.GetId().Equals("###"))
             {
