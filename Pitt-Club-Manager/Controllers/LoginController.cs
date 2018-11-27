@@ -51,18 +51,20 @@ namespace PittClubManager.Controllers
 
                 FirebaseAuth newUser = task.Result;
                 Console.WriteLine("SignInWithEmailAndPasswordAsync success: {0}, {1}", _email, _password);
+                //System.Diagnostics.Debug.WriteLine("Logged in as " + newUser.User.LocalId);
+                user = Util.FirebaseHelper.GetUser(newUser.User.LocalId);
+                //System.Diagnostics.Debug.WriteLine("User is " + user.GetId());
 
-                user.SetId(newUser.User.LocalId);
-
-
-            });
-            System.Threading.Thread.Sleep(500); // Needed for SignInWithEmailAndPasswordAsync to finish
-
+            }).ConfigureAwait(false);
+            System.Threading.Thread.Sleep(2000); // Needed for SignInWithEmailAndPasswordAsync to finish
             if (user.GetId().Equals("###"))
             {
                 TempData["InvalidLogin"] = true;
                 return RedirectToAction("Index", "Login");
             }
+
+            Session["CurUser"] = user;
+
             return RedirectToAction("Index", "Home");
         }
 
