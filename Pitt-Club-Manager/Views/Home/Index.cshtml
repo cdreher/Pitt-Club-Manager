@@ -12,6 +12,29 @@
     <link href="content/bootstrap.min.css" rel="stylesheet">
     <!-- Custom styles for this template -->
     <link href="jumbotron.css" rel="stylesheet">
+    <style>
+        .search-menu {
+            position: absolute;
+            top: 100%;
+            z-index: 1000;
+            float: left;
+            min-width: 10rem;
+            display: block;
+            padding: .5rem 0;
+            margin: .125rem 0 0;
+            font-size: 1rem;
+            color: #212529;
+            text-align: left;
+            list-style: none;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid rgba(0,0,0,.15);
+            border-radius: .25rem;
+        }
+            .search-menu li:hover {
+                background-color: rgba(0,0,0,.15);
+            }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
@@ -40,8 +63,20 @@
                 </li>
             </ul>
             <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="text" placeholder="Search for a club" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                <input class="form-control mr-sm-2" id="filterText" onkeyup="search()" type="text" placeholder="Search for a club" aria-label="Search" >
+                <ul class="search-menu" role="menu" id="search-bar" hidden="hidden">
+                    @for (var i = 0; i <= @ViewBag.length - 1; i++)
+                    {
+                        <li>
+                            <div class="chip">
+                                <a href="@Url.Action("id", "Club", new { id = Model[i].GetId() })">@Model[i].GetName()</a>
+                                @*@Html.ActionLink(">>", "id", "Club", new { id = Model[i].GetId() }, null)*@
+                            </div>
+                        </li>
+                    }
+
+                    <hr>
+                </ul>
             </form>
         </div>
     </nav>
@@ -90,26 +125,46 @@
     <script src="Scripts/bootstrap.min.js"></script>
     <script>
         function filter(id, vis) {
-        var input, filter, ul, li, a, i;
-        input = document.getElementById(id);
-        filter = input.value.toUpperCase();
-        ul = document.getElementById("club-list");
-        li = ul.getElementsByClassName("card");
-        for (i = 0; i < li.length; i++) {
-            a = li[i].getElementsByClassName("font-weight-bold")[0];
-            if(vis){
-                if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
-                li[i].style.display = "";
+            var input, filter, ul, li, a, i;
+            input = document.getElementById(id);
+            filter = input.value.toUpperCase();
+            ul = document.getElementById("club-list");
+            li = ul.getElementsByClassName("card");
+            for (i = 0; i < li.length; i++) {
+                a = li[i].getElementsByClassName("font-weight-bold")[0];
+                if(vis){
+                    if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                        li[i].style.display = "";
+                    } else {
+                        li[i].style.display = "none";
+                    }
+                }
+                else{
+                    li[i].style.display = "";
+                }
+
+            }
+        }
+
+        function search() {
+            var input, filter, ul, li, a, i;
+            input = document.getElementById("filterText");
+            filter = input.value.toUpperCase();
+            ul = document.getElementById("search-bar");
+            li = ul.getElementsByTagName("li");
+            for (i = 0; i < li.length; i++) {
+                a = li[i].getElementsByClassName("chip")[0];
+                if (filter == ""){
+                    ul.setAttribute("hidden", "hidden");
+                }
+                else if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                    ul.removeAttribute("hidden");
+                    li[i].style.display = "";
                 } else {
                     li[i].style.display = "none";
                 }
             }
-            else{
-                li[i].style.display = "";
-            }
-
         }
-    }
     </script>
 </body>
 </html>

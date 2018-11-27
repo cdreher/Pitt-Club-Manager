@@ -1,10 +1,7 @@
 ﻿<Properties StartupConfiguration="{98C0437C-CE2C-40A1-B492-3EA146EE9416}|" NuGet.AddPackagesDialog.IncludePrerelease="True">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Util/FirebaseHelper.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Views/Home/Index.cshtml">
     <Files>
-      <File FileName="Views/Home/Index.cshtml" Line="62" Column="50" />
-      <File FileName="Models/Club.cs" Line="42" Column="27" />
-      <File FileName="Controllers/ClubController.cs" Line="46" Column="19" />
-      <File FileName="Util/FirebaseHelper.cs" Line="25" Column="10" />
+      <File FileName="Views/Home/Index.cshtml" Line="51" Column="31" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.ItemProperties.Pitt-Club-Manager PreferredExecutionTarget="MonoDevelop.Default" />
