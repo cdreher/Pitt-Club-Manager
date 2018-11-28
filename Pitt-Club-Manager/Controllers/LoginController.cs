@@ -56,7 +56,7 @@ namespace PittClubManager.Controllers
                 //System.Diagnostics.Debug.WriteLine("User is " + user.GetId());
 
             }).ConfigureAwait(false);
-            System.Threading.Thread.Sleep(2000); // Needed for SignInWithEmailAndPasswordAsync to finish
+            System.Threading.Thread.Sleep(3000); // Needed for SignInWithEmailAndPasswordAsync to finish
             if (user.GetId().Equals("###"))
             {
                 TempData["InvalidLogin"] = true;

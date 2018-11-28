@@ -29,3 +29,41 @@
 		}
 	</ul>
 </div>
+
+<div>
+	@if ((bool)TempData["UserLoggedIn"])
+	{
+		<div>
+			User is logged in.
+		</div>
+		if ((bool)TempData["CurUserInClub"])
+		{
+			<div>
+				User is currently in the club.
+			</div>
+		}
+		else
+		{
+			if ((bool)TempData["CurUserPendingApproval"])
+			{
+				<div>
+					User is pending club approval.
+				</div>
+			}
+			else
+			{
+				<div>
+					User is not in the club and not pending club approval.
+					<input type="button" value="Join club" onclick="location.href='@Url.Action("Join", "Club", (string)Session["ClubId"])'" />
+				</div>
+			}
+		}
+	}
+	else
+	{
+		<div>
+			User is not logged in.
+		</div>
+	}
+
+</div>
