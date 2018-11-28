@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using System.Web;
+using System.Web.Security;
 using Firebase.Auth;
 using Firebase.Database;
 using PittClubManager.Models;
@@ -11,6 +13,7 @@ namespace PittClubManager.Controllers
     {
         string _email { get; set; }
         string _password { get; set; }
+        bool _rememberMe { get; set; }
         Models.User user = new Models.User("###", "John", "Doe");
         public static FirebaseClient firebase { get; set; }
         public static FirebaseAuthProvider authProvider { get; set; }
@@ -33,6 +36,12 @@ namespace PittClubManager.Controllers
         {
             _email = formCollection["login-email"];
             _password = formCollection["login-password"];
+            if (formCollection["login-remember"].Equals("on"))
+                _rememberMe = true;
+            else
+                _rememberMe = false;
+
+            Console.WriteLine("rememberMe: {0}", _rememberMe);
 
             firebase = new FirebaseClient("https://pitt-club-manager.firebaseio.com");
             authProvider = new FirebaseAuthProvider(new FirebaseConfig("AIzaSyCN8Av2-nfNtsRdlWaZiaejPdwQ4QqA38c"));
@@ -55,6 +64,14 @@ namespace PittClubManager.Controllers
 
                 user.SetId(newUser.User.LocalId);
 
+                int timeout = _rememberMe ? 525600 : 1;  //525600 min = 1 year
+                var ticket = new FormsAuthenticationTicket(_email, _rememberMe, timeout);
+                string encrypted = FormsAuthentication.Encrypt(ticket);
+                var cookie = new HttpCookie(FormsAuthentication.FormsCookieName, encrypted);
+                cookie.Expires = DateTime.Now.AddMinutes(timeout);
+                cookie.HttpOnly = true;
+                Response.Cookies.Add(cookie);
+
 
             }).ConfigureAwait(false);
 
@@ -71,6 +88,11 @@ namespace PittClubManager.Controllers
         {
             _email = formCollection["register-email"];
             _password = formCollection["register-password"];
+            if (formCollection["login-remember"].Equals("on"))
+                _rememberMe = true;
+            else
+                _rememberMe = false;
+            Console.WriteLine("rememberMe: {0}", _rememberMe);
             var confirm_password = formCollection["confirm-password"];
 
             if(!(_password.Equals(confirm_password)))
@@ -100,6 +122,14 @@ namespace PittClubManager.Controllers
 
                 user.SetId(newUser.User.LocalId);
 
+                int timeout = _rememberMe ? 525600 : 1;  //525600 min = 1 year
+                var ticket = new FormsAuthenticationTicket(_email, _rememberMe, timeout);
+                string encrypted = FormsAuthentication.Encrypt(ticket);
+                var cookie = new HttpCookie(FormsAuthentication.FormsCookieName, encrypted);
+                cookie.Expires = DateTime.Now.AddMinutes(timeout);
+                cookie.HttpOnly = true;
+                Response.Cookies.Add(cookie);
+
 
             }).ConfigureAwait(false);
 
@@ -110,6 +140,12 @@ namespace PittClubManager.Controllers
             }
 
             return RedirectToAction("Index", "Home");
+        }
+
+        public ActionResult Logout()
+        {
+            FormsAuthentication.SignOut();
+            return RedirectToAction("Index", "Login");
         }
     }
 }

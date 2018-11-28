@@ -13,8 +13,20 @@
         <link href="~/jumbotron.css" rel="stylesheet">
     </head>
     <body>
+        @if (Request.IsAuthenticated)
+    {
         <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-            <a class="navbar-brand" href="@Url.Action("Index", "Home")">Home</a>
+            <ul class="navbar-nav mr-auto">
+                <li>
+                    <a class="navbar-brand" href="@Url.Action("Index", "Home")">Home</a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Logout", "Login")">Logout</a>
+                </li>
+                <li>
+                    <h5>@HttpContext.Current.User.Identity.Name</h5>
+                </li>
+            </ul>
         </nav>
         <main role="main">
             <div class="jumbotron">
@@ -25,18 +37,18 @@
                         <h5>Club Roster:</h5>
                         <ul class="list-group list-group-flush" style="flex-direction: row; margin-bottom: 15px;">
                             @foreach (var member in Model.GetMembers())
-                            {
-                                <li class="list-group-item">@member.GetFirstName() @member.GetLastName()</li>
-                            }
+                        {
+                            <li class="list-group-item">@member.GetFirstName() @member.GetLastName()</li>
+                    }
                         </ul>
                     </div>
                     <div id="events">
                         <h5>Events</h5>
                         <ul class="list-group list-group-flush" style="flex-direction: row; margin-bottom: 15px;">
                             @foreach (var e in Model.GetEvents())
-                            {
-                                <li class="list-group-item">@e.GetId() - @e.GetName() - @e.GetDescription() - @e.GetStart() </li>
-                            }
+                        {
+                            <li class="list-group-item">@e.GetId() - @e.GetName() - @e.GetDescription() - @e.GetStart() </li>
+                    }
                         </ul>
                     </div>
                 </div>
@@ -45,11 +57,17 @@
 
 
         </main>
+        }
+        else
+        {
+            @Html.Action("Index", "Home")
+        }
+
         <footer class="container">
             <p>CS1530 Software Engineering</p>
         </footer>
         <!-- Bootstrap core JavaScript
-        ================================================== -->
+    ================================================== -->
         <!-- Placed at the end of the document so the pages load faster -->
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
         <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>

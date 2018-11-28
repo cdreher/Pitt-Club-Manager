@@ -37,82 +37,90 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-        <a class="navbar-brand" href="#">Menu</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-            <ul class="navbar-nav mr-auto">
-                <li class="navbar-brand">
-                    @Html.ActionLink("Log In", "Index", "Login", null, new { @class = "page-scroll" })
-                </li>
-                <li class="nav-item dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        What are your interests?
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdown01">
-                        <p class="dropdown-item"><input type="checkbox" id="opt1" value="My Clubs" onchange="filter(this.id, this.checked)"/>&nbsp;&nbsp;&nbsp;&nbsp;My Clubs</p>
-                        <p class="dropdown-item"><input type="checkbox" id="opt2" value="Sports" onchange="filter(this.id, this.checked)"/>&nbsp;&nbsp;&nbsp;&nbsp;Sports</p>
-                        <p class="dropdown-item"><input type="checkbox" id="opt3" value="Gaming" onchange="filter(this.id, this.checked)"/>&nbsp;&nbsp;&nbsp;&nbsp;Gaming</p>
-                        <p class="dropdown-item"><input type="checkbox" id="opt4" value="Academic" onchange="filter(this.id, this.checked)"/>&nbsp;&nbsp;&nbsp;&nbsp;Academic</p>
-                        <p class="dropdown-item"><input type="checkbox" id="opt5" value="Newly Added" onchange="filter(this.id, this.checked)"/>&nbsp;&nbsp;&nbsp;&nbsp;Newly Added</p>
-                        <p class="dropdown-item"><input type="checkbox" id="opt6" value="Most members" onchange="filter(this.id, this.checked)"/>&nbsp;&nbsp;&nbsp;&nbsp;Most members</p>
-                        <p class="dropdown-item"><input type="checkbox" id="opt7" value="Least members" onchange="filter(this.id, this.checked)"/>&nbsp;&nbsp;&nbsp;&nbsp;Least members</p>
-                    </div>
-                </li>
-            </ul>
-            <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" id="filterText" onkeyup="search()" type="text" placeholder="Search for a club" aria-label="Search" >
-                <ul class="search-menu" role="menu" id="search-bar" hidden="hidden">
-                    @for (var i = 0; i <= @ViewBag.length - 1; i++)
-                    {
-                        <li>
-                            <div class="chip">
-                                <a href="@Url.Action("id", "Club", new { id = Model[i].GetId() })">@Model[i].GetName()</a>
-                                @*@Html.ActionLink(">>", "id", "Club", new { id = Model[i].GetId() }, null)*@
-                            </div>
-                        </li>
-                    }
-
-                    <hr>
-                </ul>
-            </form>
-        </div>
-    </nav>
-    <main role="main">
-        <div class="jumbotron">
-            <div class="container">
-                <h1 class="display-3">Pick your club!</h1>
-                <p>Welcome to Pitt's club manager.  This is the place to keep track of all of the clubs you are in!  Click a club's check box to join.  Visit the club's homepage to learn more.</p>
-            </div>
-        </div>
-
-
-        <div class="container" id="club-list">
-            @for (var i = 0; i <= @ViewBag.length - 1; i++)
-            {
-                <div class="col-md-4 card" style="float:left; height:350px;">
-                    <h2>@Model[i].GetName()</h2>
-                    <p style="overflow-y:scroll">@Model[i].GetDescription()</p>
-                    <p class="font-weight-bold font-italic">@Model[i].GetFilter()</p>
-
-                    @Html.ActionLink("Club page", "id", "Club", new { id = Model[i].GetId() }, new { @class = "page-scroll" })
-
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <div class="input-group-text">
-                                <input type="checkbox">
-                            </div>
+    @if (Request.IsAuthenticated)
+    {
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+            <a href="@Url.Action("Logout", "Login")">Logout</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+                <ul class="navbar-nav mr-auto">
+                    <li class="navbar-text">
+                        @HttpContext.Current.User.Identity.Name
+                    </li>
+                    <li class="nav-item dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            What are your interests?
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdown01">
+                            <p class="dropdown-item"><input type="checkbox" id="opt1" value="My Clubs" onchange="filter(this.id, this.checked)" />&nbsp;&nbsp;&nbsp;&nbsp;My Clubs</p>
+                            <p class="dropdown-item"><input type="checkbox" id="opt2" value="Sports" onchange="filter(this.id, this.checked)" />&nbsp;&nbsp;&nbsp;&nbsp;Sports</p>
+                            <p class="dropdown-item"><input type="checkbox" id="opt3" value="Gaming" onchange="filter(this.id, this.checked)" />&nbsp;&nbsp;&nbsp;&nbsp;Gaming</p>
+                            <p class="dropdown-item"><input type="checkbox" id="opt4" value="Academic" onchange="filter(this.id, this.checked)" />&nbsp;&nbsp;&nbsp;&nbsp;Academic</p>
+                            <p class="dropdown-item"><input type="checkbox" id="opt5" value="Newly Added" onchange="filter(this.id, this.checked)" />&nbsp;&nbsp;&nbsp;&nbsp;Newly Added</p>
+                            <p class="dropdown-item"><input type="checkbox" id="opt6" value="Most members" onchange="filter(this.id, this.checked)" />&nbsp;&nbsp;&nbsp;&nbsp;Most members</p>
+                            <p class="dropdown-item"><input type="checkbox" id="opt7" value="Least members" onchange="filter(this.id, this.checked)" />&nbsp;&nbsp;&nbsp;&nbsp;Least members</p>
                         </div>
-                        <input type="text" class="form-control" placeholder="Join @Model[i].GetName()" disabled>
-                    </div>
-                </div>
-            }
+                    </li>
+                </ul>
+                <form class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2" id="filterText" onkeyup="search()" type="text" placeholder="Search for a club" aria-label="Search">
+                    <ul class="search-menu" role="menu" id="search-bar" hidden="hidden">
+                        @for (var i = 0; i <= @ViewBag.length - 1; i++)
+                        {
+                            <li>
+                                <div class="chip">
+                                    <a href="@Url.Action("id", "Club", new { id = Model[i].GetId() })">@Model[i].GetName()</a>
+                                    @*@Html.ActionLink(">>", "id", "Club", new { id = Model[i].GetId() }, null)*@
+                                </div>
+                            </li>
+                        }
 
-            <hr>
-        </div>
+                        <hr>
+                    </ul>
+                </form>
+            </div>
+        </nav>
+        <main role="main">
+            <div class="jumbotron">
+                <div class="container">
+                    <h1 class="display-3">Pick your club!</h1>
+                    <p>Welcome to Pitt's club manager.  This is the place to keep track of all of the clubs you are in!  Click a club's check box to join.  Visit the club's homepage to learn more.</p>
+                </div>
+            </div>
+
+
+            <div class="container" id="club-list">
+                @for (var i = 0; i <= @ViewBag.length - 1; i++)
+                {
+                    <div class="col-md-4 card" style="float:left; height:350px;">
+                        <h2>@Model[i].GetName()</h2>
+                        <p style="overflow-y:scroll">@Model[i].GetDescription()</p>
+                        <p class="font-weight-bold font-italic">@Model[i].GetFilter()</p>
+
+                        @Html.ActionLink("Club page", "id", "Club", new { id = Model[i].GetId() }, new { @class = "page-scroll" })
+
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <input type="checkbox">
+                                </div>
+                            </div>
+                            <input type="text" class="form-control" placeholder="Join @Model[i].GetName()" disabled>
+                        </div>
+                    </div>
+                }
+
+                <hr>
+            </div>
         </main>
+    }
+    else
+    {
+        @Html.Action("Index", "Login")
+    }
+
     <footer class="container">
         <p>CS1530 Software Engineering</p>
     </footer>
