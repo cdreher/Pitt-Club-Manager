@@ -25,6 +25,14 @@ namespace PittClubManager.Controllers
             x = FirebaseHelper.GetClubList().Result;
             ViewBag.length = x.Count;
             //ViewBag.user = FirebaseHelper.GetUser()
+            Models.User curUser = (Models.User)Session["CurUser"];
+            if(curUser != null)
+            {
+                System.Diagnostics.Debug.WriteLine("Current user is: " + curUser.GetFirstName());
+            } else
+            {
+                System.Diagnostics.Debug.WriteLine("No user logged in.");
+            }
             return View("Index", x);
         }
     }

@@ -43,14 +43,22 @@ namespace PittClubManager.Controllers
             Console.WriteLine(html);
         }
 
+        public ActionResult Join()
+        {
+            //System.Diagnostics.Debug.WriteLine("Attempting to join club and return to " + (string)Session["ClubId"]);
+
+
+            Models.User curUser = (Models.User)Session["CurUser"];
+            var b = FirebaseHelper.RequestJoinClub(curUser.GetId(), (string)Session["ClubId"]).Result;
+
+            return RedirectToAction("Id", "Club", new {id = (string)Session["ClubId"] });
+            //var c = FirebaseHelper.GetClub("SAMPLE_CLUB").Result;
+            //return View("SAMPLE_CLUB", c);
+        }
+
         public ActionResult Id(String id)
         {
             // todo: this should eventually fetch the club from the db by id
-            String s = Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS");
-            GrpcEnvironment.SetLogger(new ConsoleLogger());
-            System.Diagnostics.Debug.WriteLine("Environment var: " + s);
-
-            //Models.User user = FirebaseHelper.GetUser("SAMPLE_USER").Result;
             var c = FirebaseHelper.GetClub(id).Result;
             /*Task<System.Collections.ArrayList> clTask = FirebaseHelper.GetClubList();
             clTask.Wait();
@@ -61,6 +69,20 @@ namespace PittClubManager.Controllers
                 Club cur = (PittClubManager.Models.Club)cl[i];
                 System.Diagnostics.Debug.WriteLine(cur.GetId());
             }*/
+            Session["ClubId"] = id;
+            System.Diagnostics.Debug.WriteLine("Set clubId to " + (string)Session["ClubId"]);
+            TempData["CurUserInClub"] = false;
+            TempData["UserLoggedIn"] = false;
+            TempData["CurUserPendingApproval"] = false;
+            Models.User curUser = (Models.User)Session["CurUser"];
+            // check if the user is logged in. If they are logged in, check if they are in the club
+            // if they are in the club, they should be able to see everything. Otherwise, there should be a button to request to join
+            if(curUser != null && curUser.GetId() != "###")
+            {
+                TempData["UserLoggedIn"] = true;
+                TempData["CurUserInClub"] = FirebaseHelper.UserInClub(curUser.GetId(), id);
+                TempData["CurUserPendingApproval"] = FirebaseHelper.UserPendingClubApproval(curUser.GetId(), id);
+            }
             return View("Id", c);
         }
     }
