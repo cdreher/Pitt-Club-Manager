@@ -1,0 +1,19 @@
+﻿<!doctype html>
+<html lang="en">
+<body>
+    <h1>Superuser</h1>
+    <div id="pendingClubs">
+        <h2>Pending Clubs</h2>
+        @if (Model.Length == 0)
+        {
+            <div>No pending clubs</div>
+        }
+        <ul>
+            @foreach (var c in Model)
+            {
+                <li><span>@c.GetId() - @c.GetName() - @c.GetDescription() - @c.GetManager().GetFirstName() - @c.GetManager().GetLastName()</span><a href="@Url.Action("ApproveClub", "Superuser",  new { id = c.GetId()})">Approve</a></li>
+            }
+        </ul>
+    </div>
+</body>
+</html>
