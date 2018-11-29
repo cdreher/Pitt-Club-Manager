@@ -6,6 +6,8 @@ using System.Web.Security;
 using Firebase.Auth;
 using Firebase.Database;
 using PittClubManager.Models;
+using System.Collections.Generic;
+using Google.Cloud.Firestore;
 
 namespace PittClubManager.Controllers
 {
@@ -73,6 +75,9 @@ namespace PittClubManager.Controllers
                 Response.Cookies.Add(cookie);
 
 
+                //System.Diagnostics.Debug.WriteLine("Logged in as " + newUser.User.LocalId);
+                user = Util.FirebaseHelper.GetUser(newUser.User.LocalId);
+                //System.Diagnostics.Debug.WriteLine("User is " + user.GetId());
             }).ConfigureAwait(false);
 
             if (user.GetId().Equals("###"))
@@ -80,6 +85,9 @@ namespace PittClubManager.Controllers
                 TempData["InvalidLogin"] = true;
                 return RedirectToAction("Index", "Login");
             }
+
+            Session["CurUser"] = user;
+
             return RedirectToAction("Index", "Home");
         }
 
@@ -105,7 +113,7 @@ namespace PittClubManager.Controllers
             firebase = new FirebaseClient("https://pitt-club-manager.firebaseio.com");
             authProvider = new FirebaseAuthProvider(new FirebaseConfig("AIzaSyCN8Av2-nfNtsRdlWaZiaejPdwQ4QqA38c"));
 
-            await authProvider.CreateUserWithEmailAndPasswordAsync(_email, _password).ContinueWith(task =>
+            await authProvider.CreateUserWithEmailAndPasswordAsync(_email, _password).ContinueWith(async task =>
             {
                 if (task.IsCanceled)
                 {

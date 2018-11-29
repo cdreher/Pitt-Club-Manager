@@ -9,6 +9,7 @@ namespace PittClubManager.Models
         private string filter;
         private User manager;
         private User[] members;
+        private User[] memberRequests;
         private Event[] events;
 
         public Club(){
@@ -75,6 +76,16 @@ namespace PittClubManager.Models
 
         public void SetMembers(User[] members) {
             this.members = members;
+        }
+
+        public void SetMemberRequests(User[] memberRequests)
+        {
+            this.memberRequests = memberRequests;
+        }
+
+        public User[] GetMemberRequests()
+        {
+            return memberRequests;
         }
 
     }
