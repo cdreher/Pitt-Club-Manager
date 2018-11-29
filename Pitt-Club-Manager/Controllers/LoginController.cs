@@ -36,10 +36,10 @@ namespace PittClubManager.Controllers
         {
             _email = formCollection["login-email"];
             _password = formCollection["login-password"];
-            if (formCollection["login-remember"].Equals("on"))
-                _rememberMe = true;
-            else
+            if (formCollection["login-remember"] == null)
                 _rememberMe = false;
+            else
+                _rememberMe = true;
 
             Console.WriteLine("rememberMe: {0}", _rememberMe);
 
@@ -88,10 +88,11 @@ namespace PittClubManager.Controllers
         {
             _email = formCollection["register-email"];
             _password = formCollection["register-password"];
-            if (formCollection["login-remember"].Equals("on"))
-                _rememberMe = true;
-            else
+            if (formCollection["register-remember"] == null)
                 _rememberMe = false;
+            else
+                _rememberMe = true;
+
             Console.WriteLine("rememberMe: {0}", _rememberMe);
             var confirm_password = formCollection["confirm-password"];
 

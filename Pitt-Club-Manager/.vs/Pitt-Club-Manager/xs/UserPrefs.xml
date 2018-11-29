@@ -1,10 +1,10 @@
 ﻿<Properties StartupConfiguration="{98C0437C-CE2C-40A1-B492-3EA146EE9416}|" NuGet.AddPackagesDialog.IncludePrerelease="True">
   <MonoDevelop.Ide.Workbench ActiveDocument="Views/Club/Id.cshtml">
     <Files>
-      <File FileName="Controllers/LoginController.cs" Line="39" Column="44" />
-      <File FileName="Views/Login/Index.cshtml" Line="1" Column="1" />
-      <File FileName="Views/Home/Index.cshtml" Line="40" Column="4" />
-      <File FileName="Views/Club/Id.cshtml" Line="18" Column="9" />
+      <File FileName="Controllers/LoginController.cs" Line="142" Column="14" />
+      <File FileName="Views/Login/Index.cshtml" Line="71" Column="105" />
+      <File FileName="Views/Home/Index.cshtml" Line="48" Column="48" />
+      <File FileName="Views/Club/Id.cshtml" Line="26" Column="21" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.ItemProperties.Pitt-Club-Manager PreferredExecutionTarget="MonoDevelop.Default" />

@@ -14,49 +14,46 @@
     </head>
     <body>
         @if (Request.IsAuthenticated)
-    {
-        <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-            <ul class="navbar-nav mr-auto">
-                <li>
-                    <a class="navbar-brand" href="@Url.Action("Index", "Home")">Home</a>
-                </li>
-                <li>
-                    <a href="@Url.Action("Logout", "Login")">Logout</a>
-                </li>
-                <li>
-                    <h5>@HttpContext.Current.User.Identity.Name</h5>
-                </li>
-            </ul>
-        </nav>
-        <main role="main">
-            <div class="jumbotron">
-                <div class="container">
-                    <h1>@Model.GetName()</h1>
-                    <h5>Club Manager: @Model.GetManager().GetFirstName() @Model.GetManager().GetLastName()</h5>
-                    <div id="members">
-                        <h5>Club Roster:</h5>
-                        <ul class="list-group list-group-flush" style="flex-direction: row; margin-bottom: 15px;">
-                            @foreach (var member in Model.GetMembers())
-                        {
-                            <li class="list-group-item">@member.GetFirstName() @member.GetLastName()</li>
-                    }
-                        </ul>
-                    </div>
-                    <div id="events">
-                        <h5>Events</h5>
-                        <ul class="list-group list-group-flush" style="flex-direction: row; margin-bottom: 15px;">
-                            @foreach (var e in Model.GetEvents())
-                        {
-                            <li class="list-group-item">@e.GetId() - @e.GetName() - @e.GetDescription() - @e.GetStart() </li>
-                    }
-                        </ul>
+        {
+            <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+                <a href="@Url.Action("Logout", "Login")">Logout</a>
+                <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="navbar-text" style="padding: .5rem">
+                            @HttpContext.Current.User.Identity.Name
+                        </li>
+                    </ul>
+                    <form class="form-inline my-2 my-lg-0">
+                        <a class="navbar-brand" href="@Url.Action("Index", "Home")">Home</a>
+                    </form>
+                </div>
+            </nav>
+            <main role="main">
+                <div class="jumbotron">
+                    <div class="container">
+                        <h1>@Model.GetName()</h1>
+                        <h5>Club Manager: @Model.GetManager().GetFirstName() @Model.GetManager().GetLastName()</h5>
+                        <div id="members">
+                            <h5>Club Roster:</h5>
+                            <ul class="list-group list-group-flush" style="flex-direction: row; margin-bottom: 15px;">
+                                @foreach (var member in Model.GetMembers())
+                            {
+                                <li class="list-group-item">@member.GetFirstName() @member.GetLastName()</li>
+                        }
+                            </ul>
+                        </div>
+                        <div id="events">
+                            <h5>Events</h5>
+                            <ul class="list-group list-group-flush" style="flex-direction: row; margin-bottom: 15px;">
+                                @foreach (var e in Model.GetEvents())
+                            {
+                                <li class="list-group-item">@e.GetId() - @e.GetName() - @e.GetDescription() - @e.GetStart() </li>
+                        }
+                            </ul>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-
-
-        </main>
+            </main>
         }
         else
         {
