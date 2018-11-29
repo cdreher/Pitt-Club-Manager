@@ -50,17 +50,14 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="text-center">
-                                                <a href="@Url.Action("Index", "ForgotPassword")" tabindex="5" class="forgot-password">Forgot Password?</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </form>
                             <form id="register-form" action="@Url.Action("Register","Login")" method="post" role="form" style="display: none;">
+                                <div class="form-group">
+                                    <input type="text" name="register-fName" id="register-fName" tabindex="1" class="form-control" placeholder="First Name" value="" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" name="register-lName" id="register-lName" tabindex="1" class="form-control" placeholder="Last Name" value="" required>
+                                </div>
                                 <div class="form-group">
                                     <input type="email" name="register-email" id="register-email" tabindex="1" class="form-control" placeholder="Email Address" value="" required>
                                 </div>
