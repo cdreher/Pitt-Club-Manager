@@ -43,11 +43,11 @@
                             </ul>
                         </div>
                         <div id="events">
-                            <h5>Events</h5>
+                            <h5>Club Schedule:</h5>
                             <ul class="list-group list-group-flush" style="flex-direction: row; margin-bottom: 15px;">
                                 @foreach (var e in Model.GetEvents())
                                 {
-                                    <li class="list-group-item">@e.GetId() - @e.GetName() - @e.GetDescription() - @e.GetStart() </li>
+                                    <li class="list-group-item">@e.GetName() - @e.GetLocation() - @e.GetStart() </li>
                                 }
                             </ul>
                         </div>

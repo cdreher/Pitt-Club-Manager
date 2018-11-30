@@ -16,6 +16,7 @@ namespace PittClubManager.Util
         public const string DB_NAME = "pitt-club-manager";
         public const string COLLECTION_CLUBS = "clubs";
         public const string COLLECTION_USERS = "users";
+        public const string COLLECTION_EVENTS = "events";
         public const string COLLECTION_PENDING_CLUBS = "pendingClubs";
         public const string EMAIL = "jmaciak14@gmail.com";
         public const string PASSWORD = "password";
@@ -293,11 +294,6 @@ namespace PittClubManager.Util
             snap.TryGetValue<string[]>("memberIds", out memberIds); // put all of these into own try catch
             snap.TryGetValue<string[]>("eventIds", out eventIds);
             snap.TryGetValue<string[]>("memberRequests", out memberRequestIds);
-            /*PittClubManager.Models.Event[] events = new PittClubManager.Models.Event[eventIds.Length];
-            for (int i = 0; i < eventIds.Length; i++)
-            {
-                //members[i] = GetEvent(eventIds[i]).Result;
-            }*/
 
             PittClubManager.Models.User manager = GetUser(managerId);
             c.SetManager(manager);
@@ -305,10 +301,46 @@ namespace PittClubManager.Util
             PittClubManager.Models.User[] members = GetUsersFromIds(memberIds);
             PittClubManager.Models.User[] memberRequests = GetUsersFromIds(memberRequestIds);
 
+            PittClubManager.Models.Event[] events = GetEventsFromIds(eventIds);
+
             c.SetMembers(members);
             c.SetMemberRequests(memberRequests);
-            //c.SetEvents(events);
+            c.SetEvents(events);
             return c;
+        }
+
+        public static PittClubManager.Models.Event[] GetEventsFromIds(string[] ids)
+        {
+            if (ids == null) return new Models.Event[0];
+            FirebaseClient firebase = new FirebaseClient(FIREBASE_URL);
+            var authProvider = new FirebaseAuthProvider(new FirebaseConfig(WEB_KEY));
+            FirebaseAuthLink res = authProvider.SignInWithEmailAndPasswordAsync(EMAIL, PASSWORD).Result;
+            FirestoreDb db = FirestoreDb.Create(DB_NAME);
+            QuerySnapshot snap = db.Collection(COLLECTION_EVENTS).GetSnapshotAsync().Result;
+            ArrayList events = new ArrayList();
+            foreach (var doc in snap.Documents)
+            {
+                foreach (var id in ids)
+                {
+                    if (id.Equals(doc.Id))
+                    {
+                        events.Add(EventSnapshotToEvent(doc));
+                    }
+                }
+            }
+            return (PittClubManager.Models.Event[])events.ToArray(typeof(PittClubManager.Models.Event));
+        }
+
+        private static Models.Event EventSnapshotToEvent(DocumentSnapshot snap)
+        {
+            Models.Event _event = new Models.Event("", DateTime.Now, "", "");
+
+            _event.SetId(snap.Id);
+            _event.SetName(snap.GetValue<string>("name"));
+            _event.SetLocation(snap.GetValue<string>("location"));
+            _event.SetStart(snap.GetValue<DateTime>("datetime"));
+
+            return _event;
         }
 
         private static Club PendingClubSnapshotToClub(DocumentSnapshot snap)
