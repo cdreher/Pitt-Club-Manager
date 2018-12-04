@@ -104,8 +104,79 @@
         }
         else
         {
-            @Html.Action("Index", "Home")
+
+            <li>@member.GetFirstName() @member.GetLastName()</li>
         }
+    </ul>
+</div>
+
+<div id="events">
+    Events
+    <ul>
+        @foreach (var e in Model.GetEvents()) {
+            <li>@e.GetId() - @e.GetName() - @e.GetDescription() - @e.GetStart() </li>
+        }
+    </ul>
+</div>
+
+<div id="memberRequests">
+	Member requests
+	<ul>
+		@foreach (var member in Model.GetMemberRequests())
+		{
+		<li>
+			@member.GetId(): @member.GetFirstName() @member.GetLastName()
+			@if ((bool)TempData["CurUserIsManager"])
+			{
+			<div>
+				Approve:
+			</div>
+			<input type="button" value="Approve member" onclick="location.href='@Url.Action("Approve", "Club", new { uid = member.GetId() } )'" />
+			}
+		</li>
+
+		}
+	</ul>
+</div>
+
+<div>
+	@if ((bool)TempData["UserLoggedIn"])
+	{
+		<div>
+			User is logged in.
+		</div>
+		if ((bool)TempData["CurUserInClub"])
+		{
+			<div>
+				User is currently in the club.
+			</div>
+		}
+		else
+		{
+			if ((bool)TempData["CurUserPendingApproval"])
+			{
+				<div>
+					User is pending club approval.
+				</div>
+			}
+			else
+			{
+				<div>
+					User is not in the club and not pending club approval.
+					<input type="button" value="Join club" onclick="location.href='@Url.Action("Join", "Club", (string)Session["ClubId"])'" />
+				</div>
+			}
+		}
+	}
+	else
+	{
+		<div>
+			User is not logged in.
+		</div>
+	}
+
+</div>
+
 
         <footer class="container">
             <p>CS1530 Software Engineering</p>
