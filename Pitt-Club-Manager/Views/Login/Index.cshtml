@@ -1,8 +1,7 @@
 ﻿<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 <link href="~/Content/login-register.css" rel="stylesheet" />
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
-<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
-
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
 <div class="container">
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
@@ -41,8 +40,8 @@
                                     </div>
                                 }
                                 <div class="form-group text-center">
-                                    <input type="checkbox" tabindex="3" class="" name="remember" id="remember">
-                                    <label for="remember"> Remember Me</label>
+                                    <input type="checkbox" tabindex="3" class="" name="login-remember" id="login-remember">
+                                    <label for="login-remember"> Remember Me</label>
                                 </div>
                                 <div class="form-group">
                                     <div class="row">
@@ -51,17 +50,14 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="text-center">
-                                                <a href="@Url.Action("Index", "ForgotPassword")" tabindex="5" class="forgot-password">Forgot Password?</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </form>
                             <form id="register-form" action="@Url.Action("Register","Login")" method="post" role="form" style="display: none;">
+                                <div class="form-group">
+                                    <input type="text" name="register-fName" id="register-fName" tabindex="1" class="form-control" placeholder="First Name" value="" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" name="register-lName" id="register-lName" tabindex="1" class="form-control" placeholder="Last Name" value="" required>
+                                </div>
                                 <div class="form-group">
                                     <input type="email" name="register-email" id="register-email" tabindex="1" class="form-control" placeholder="Email Address" value="" required>
                                 </div>
@@ -70,6 +66,10 @@
                                 </div>
                                 <div class="form-group">
                                     <input type="password" name="confirm-password" id="confirm-password" tabindex="2" class="form-control" placeholder="Confirm Password" required oninput="check(this)">
+                                </div>
+                                <div class="form-group text-center">
+                                    <input type="checkbox" tabindex="3" class="" name="register-remember" id="register-remember">
+                                    <label for="register-remember"> Remember Me</label>
                                 </div>
                                 <div class="form-group">
                                     <div class="row">
@@ -88,21 +88,22 @@
 </div>
 <script>
     $(function() {
-            $('#login-form-link').click(function(e) {
-                $("#login-form").delay(100).fadeIn(100);
-                $("#register-form").fadeOut(100);
-                $('#register-form-link').removeClass('active');
-                $(this).addClass('active');
-                e.preventDefault();
-            });
-            $('#register-form-link').click(function(e) {
-                $("#register-form").delay(100).fadeIn(100);
-                $("#login-form").fadeOut(100);
-                $('#login-form-link').removeClass('active');
-                $(this).addClass('active');
-                e.preventDefault();
-            });
-            $('#confirm-password').onkeyup = validatePassword;
+    $('#login-form-link').click(function(e) {
+        $("#login-form").show();
+        $("#register-form").hide();
+        $('#register-form-link').removeClass('active');
+        $(this).addClass('active');
+        e.preventDefault();
+    });
+    $('#register-form-link').click(function(e) {
+        $("#register-form").show();
+        $("#login-form").hide();
+        $('#login-form-link').removeClass('active');
+        $(this).addClass('active');
+        e.preventDefault();
+    });
+
+            $('#confirm-password').onkeyup = check;
 
     });
 

@@ -16,7 +16,8 @@ namespace PittClubManager.Util
         public const string DB_NAME = "pitt-club-manager";
         public const string COLLECTION_CLUBS = "clubs";
         public const string COLLECTION_USERS = "users";
-
+        public const string COLLECTION_EVENTS = "events";
+        public const string COLLECTION_PENDING_CLUBS = "pendingClubs";
         public const string EMAIL = "jmaciak14@gmail.com";
         public const string PASSWORD = "password";
         public const string WEB_KEY = "AIzaSyCN8Av2-nfNtsRdlWaZiaejPdwQ4QqA38c";
@@ -257,6 +258,7 @@ namespace PittClubManager.Util
 
         public static PittClubManager.Models.User[] GetUsersFromIds(string[] ids)
         {
+            if (ids == null) return new Models.User[0];
             FirebaseClient firebase = new FirebaseClient(FIREBASE_URL);
             var authProvider = new FirebaseAuthProvider(new FirebaseConfig(WEB_KEY));
             FirebaseAuthLink res = authProvider.SignInWithEmailAndPasswordAsync(EMAIL, PASSWORD).Result;
@@ -274,6 +276,60 @@ namespace PittClubManager.Util
                 }
             }
             return (PittClubManager.Models.User[]) users.ToArray(typeof(PittClubManager.Models.User));
+        }
+
+        public static void CreateClub(String clubName, String description, String managerId)
+        {
+            FirebaseClient firebase = new FirebaseClient(FIREBASE_URL);
+            var authProvider = new FirebaseAuthProvider(new FirebaseConfig(WEB_KEY));
+            FirebaseAuthLink res = authProvider.SignInWithEmailAndPasswordAsync(EMAIL, PASSWORD).Result;
+            FirestoreDb db = FirestoreDb.Create(DB_NAME);
+            // todo: check to make sure this club doesn't already exist in created clubs
+            var result = db.Collection(COLLECTION_PENDING_CLUBS).AddAsync(new Dictionary<String, String>()
+            {
+                {"name", clubName},
+                {"description", description},
+                {"managerId", managerId}
+            }).Result;
+        }
+
+        public static Club[] GetPendingClubs()
+        {
+            FirebaseClient firebase = new FirebaseClient(FIREBASE_URL);
+            var authProvider = new FirebaseAuthProvider(new FirebaseConfig(WEB_KEY));
+            FirebaseAuthLink res = authProvider.SignInWithEmailAndPasswordAsync(EMAIL, PASSWORD).Result;
+            FirestoreDb db = FirestoreDb.Create(DB_NAME);
+            var snap = db.Collection(COLLECTION_PENDING_CLUBS).GetSnapshotAsync().Result;
+            ArrayList pendingClubs = new ArrayList();
+            foreach (var doc in snap.Documents)
+            {
+                        pendingClubs.Add(PendingClubSnapshotToClub(doc));                
+            }
+            return (PittClubManager.Models.Club[])pendingClubs.ToArray(typeof(PittClubManager.Models.Club));
+        }
+
+        public static void ApproveClub(String clubId)
+        {
+            FirebaseClient firebase = new FirebaseClient(FIREBASE_URL);
+            var authProvider = new FirebaseAuthProvider(new FirebaseConfig(WEB_KEY));
+            FirebaseAuthLink res = authProvider.SignInWithEmailAndPasswordAsync(EMAIL, PASSWORD).Result;
+            FirestoreDb db = FirestoreDb.Create(DB_NAME);
+            DocumentReference clubReference = db.Collection(COLLECTION_PENDING_CLUBS).Document(clubId);
+            var snap = clubReference.GetSnapshotAsync().Result;
+            if (snap.Exists)
+            {
+                var result = db.Collection(COLLECTION_CLUBS).AddAsync(new Dictionary<string, object>
+                    {
+                        {"name", snap.GetValue<string>("name")},
+                        {"description", snap.GetValue<string>("description")},
+                        {"managerId", snap.GetValue<string>("managerId")},
+                        {"filter", "THIS NEEDS TO BE IMPLEMENTED"},
+                        {"eventIds", new string[0]},
+                        {"memberIds",new string[0]}
+                    }).Result;
+                // make sure to remove club from pending after approval
+                var deleted = clubReference.DeleteAsync().Result;
+            }
         }
 
         public static PittClubManager.Models.User GetUser(string id)
@@ -301,40 +357,74 @@ namespace PittClubManager.Util
         {
             Club c = new Club();
             c.SetName(snap.GetValue<string>("name"));
-            c.SetId(snap.GetValue<string>("id"));
+            c.SetId(snap.Id);
+            c.SetDescription(snap.GetValue<string>("description"));
+            c.SetFilter(snap.GetValue<string>("filter"));
             String managerId = snap.GetValue<string>("managerId");
-            String[] memberIds = new String[0];
-            String[] eventIds = new String[0];
-            String[] memberRequestIds = new String[0];
-            try
-            {
-                memberIds = snap.GetValue<string[]>("memberIds"); // put all of these into own try catch
-                eventIds = snap.GetValue<string[]>("eventIds");
-                memberRequestIds = snap.GetValue<string[]>("memberRequests");
-            }
-            catch (Exception e)
-            {
-            }
+            String[] memberIds;
+            String[] eventIds;
+            String[] memberRequestIds;
+            snap.TryGetValue<string[]>("memberIds", out memberIds); // put all of these into own try catch
+            snap.TryGetValue<string[]>("eventIds", out eventIds);
+            snap.TryGetValue<string[]>("memberRequests", out memberRequestIds);
+
             PittClubManager.Models.User manager = GetUser(managerId);
-            PittClubManager.Models.User[] members = new PittClubManager.Models.User[memberIds.Length];
-            PittClubManager.Models.User[] memberRequests = new PittClubManager.Models.User[memberRequestIds.Length];
-            PittClubManager.Models.Event[] events = new PittClubManager.Models.Event[eventIds.Length];
-            for (int i = 0; i < memberIds.Length; i++)
-            {
-                members[i] = GetUser(memberIds[i]);
-            }
-            for (int i = 0; i < memberRequestIds.Length; i++)
-            {
-                memberRequests[i] = GetUser(memberRequestIds[i]);
-            }
-            for (int i = 0; i < eventIds.Length; i++)
-            {
-                //members[i] = GetEvent(eventIds[i]).Result;
-            }
             c.SetManager(manager);
+
+            PittClubManager.Models.User[] members = GetUsersFromIds(memberIds);
+            PittClubManager.Models.User[] memberRequests = GetUsersFromIds(memberRequestIds);
+
+            PittClubManager.Models.Event[] events = GetEventsFromIds(eventIds);
+
             c.SetMembers(members);
-            //c.SetEvents(events);
             c.SetMemberRequests(memberRequests);
+            c.SetEvents(events);
+            return c;
+        }
+
+        public static PittClubManager.Models.Event[] GetEventsFromIds(string[] ids)
+        {
+            if (ids == null) return new Models.Event[0];
+            FirebaseClient firebase = new FirebaseClient(FIREBASE_URL);
+            var authProvider = new FirebaseAuthProvider(new FirebaseConfig(WEB_KEY));
+            FirebaseAuthLink res = authProvider.SignInWithEmailAndPasswordAsync(EMAIL, PASSWORD).Result;
+            FirestoreDb db = FirestoreDb.Create(DB_NAME);
+            QuerySnapshot snap = db.Collection(COLLECTION_EVENTS).GetSnapshotAsync().Result;
+            ArrayList events = new ArrayList();
+            foreach (var doc in snap.Documents)
+            {
+                foreach (var id in ids)
+                {
+                    if (id.Equals(doc.Id))
+                    {
+                        events.Add(EventSnapshotToEvent(doc));
+                    }
+                }
+            }
+            return (PittClubManager.Models.Event[])events.ToArray(typeof(PittClubManager.Models.Event));
+        }
+
+        private static Models.Event EventSnapshotToEvent(DocumentSnapshot snap)
+        {
+            Models.Event _event = new Models.Event("", DateTime.Now, "", "");
+
+            _event.SetId(snap.Id);
+            _event.SetName(snap.GetValue<string>("name"));
+            _event.SetLocation(snap.GetValue<string>("location"));
+            _event.SetStart(snap.GetValue<DateTime>("datetime"));
+
+            return _event;
+        }
+
+        private static Club PendingClubSnapshotToClub(DocumentSnapshot snap)
+        {
+            Club c = new Club();
+            c.SetName(snap.GetValue<string>("name"));
+            c.SetId(snap.Id);
+            c.SetDescription(snap.GetValue<string>("description"));
+            String managerId = snap.GetValue<string>("managerId");
+            PittClubManager.Models.User manager = GetUser(managerId);
+            c.SetManager(manager);
             return c;
         }
     }

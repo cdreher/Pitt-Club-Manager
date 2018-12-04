@@ -1,11 +1,110 @@
-﻿<h2>Hello, club page!</h2>
-<h3>Name: @Model.GetName() - id: @Model.GetId()</h3>
-<div>Manager: @Model.GetManager().GetFirstName() @Model.GetManager().GetLastName()</div>
-<div id="members">
-    Members
-    <ul>
-        @foreach (var member in Model.GetMembers())
+﻿﻿<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="icon" href="../../../../favicon.ico">
+        <title>Jumbotron Template for Bootstrap</title>
+        <!-- Bootstrap core CSS -->
+        <link href="~/content/bootstrap.min.css" rel="stylesheet">
+        <!-- Custom styles for this template -->
+        <link href="~/jumbotron.css" rel="stylesheet">
+    </head>
+    <body>
+        @if (Request.IsAuthenticated)
         {
+            <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+                <a href="@Url.Action("Logout", "Login")">Logout</a>
+                <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="navbar-text" style="padding: .5rem">
+                            @HttpContext.Current.User.Identity.Name
+                        </li>
+                    </ul>
+                    <form class="form-inline my-2 my-lg-0">
+                        <a class="navbar-brand" href="@Url.Action("Index", "Home")">Home</a>
+                    </form>
+                </div>
+            </nav>
+            <main role="main">
+                <div class="jumbotron">
+                    <div class="container">
+                        <h1>@Model.GetName()</h1>
+                        <h5>Club Manager: @Model.GetManager().GetFirstName() @Model.GetManager().GetLastName()</h5>
+                        <div id="members">
+                            <h5>Club Roster:</h5>
+                            <ul class="list-group list-group-flush" style="flex-direction: row; margin-bottom: 15px;">
+                                @foreach (var member in Model.GetMembers())
+                            {
+                                <li class="list-group-item">@member.GetFirstName() @member.GetLastName()</li>
+                        }
+                            </ul>
+                        </div>
+                        <div id="events">
+                            <h5>Club Schedule:</h5>
+                            <ul class="list-group list-group-flush" style="flex-direction: row; margin-bottom: 15px;">
+                                @foreach (var e in Model.GetEvents())
+                                {
+                                    <li class="list-group-item">@e.GetName() - @e.GetLocation() - @e.GetStart() </li>
+                                }
+                            </ul>
+                        </div>
+                        <div id="memberRequests">
+                            Member requests
+                            <ul>
+                                @foreach (var member in Model.GetMemberRequests())
+                                {
+                                    <li>@member.GetId(): @member.GetFirstName() @member.GetLastName()</li>
+                                }
+                            </ul>
+                        </div>
+
+                        <div>
+                            @if ((bool)TempData["UserLoggedIn"])
+                            {
+                                <div>
+                                    User is logged in.
+                                </div>
+                                if ((bool)TempData["CurUserInClub"])
+                                {
+                                    <div>
+                                        User is currently in the club.
+                                    </div>
+                                }
+                                else
+                                {
+                                    if ((bool)TempData["CurUserPendingApproval"])
+                                    {
+                                        <div>
+                                            User is pending club approval.
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div>
+                                            User is not in the club and not pending club approval.
+                                            <input type="button" value="Join club" onclick="location.href='@Url.Action("Join", "Club", (string)Session["ClubId"])'" />
+                                        </div>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <div>
+                                    User is not logged in.
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                </div>
+            </main>
+        }
+        else
+        {
+
             <li>@member.GetFirstName() @member.GetLastName()</li>
         }
     </ul>
@@ -77,3 +176,17 @@
 	}
 
 </div>
+
+
+        <footer class="container">
+            <p>CS1530 Software Engineering</p>
+        </footer>
+        <!-- Bootstrap core JavaScript
+    ================================================== -->
+        <!-- Placed at the end of the document so the pages load faster -->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
+        <script src="~/Scripts/popper.min.js"></script>
+        <script src="~/Scripts/bootstrap.min.js"></script>
+    </body>
+</html>

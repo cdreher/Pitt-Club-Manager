@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Web.Mvc;
+using System.Web;
+using System.Web.Security;
 using Firebase.Auth;
 using Firebase.Database;
 using PittClubManager.Models;
+using System.Collections.Generic;
+using Google.Cloud.Firestore;
 
 namespace PittClubManager.Controllers
 {
@@ -10,9 +15,15 @@ namespace PittClubManager.Controllers
     {
         string _email { get; set; }
         string _password { get; set; }
+        string _firstName { get; set; }
+        string _lastName { get; set; }
+        bool _rememberMe { get; set; }
         Models.User user = new Models.User("###", "John", "Doe");
         public static FirebaseClient firebase { get; set; }
         public static FirebaseAuthProvider authProvider { get; set; }
+
+        public const string DB_NAME = "pitt-club-manager";
+        public const string COLLECTION_USERS = "users";
 
         public ActionResult Index()
         {
@@ -28,15 +39,21 @@ namespace PittClubManager.Controllers
         }
 
         [HttpPost]
-        public ActionResult Login(FormCollection formCollection)
+        public async Task<ActionResult> Login(FormCollection formCollection)
         {
             _email = formCollection["login-email"];
             _password = formCollection["login-password"];
+            if (formCollection["login-remember"] == null)
+                _rememberMe = false;
+            else
+                _rememberMe = true;
+
+            Console.WriteLine("rememberMe: {0}", _rememberMe);
 
             firebase = new FirebaseClient("https://pitt-club-manager.firebaseio.com");
             authProvider = new FirebaseAuthProvider(new FirebaseConfig("AIzaSyCN8Av2-nfNtsRdlWaZiaejPdwQ4QqA38c"));
 
-            authProvider.SignInWithEmailAndPasswordAsync(_email, _password).ContinueWith(task =>
+            await authProvider.SignInWithEmailAndPasswordAsync(_email, _password).ContinueWith(async task =>
             {
                 if (task.IsCanceled)
                 {
@@ -51,12 +68,23 @@ namespace PittClubManager.Controllers
 
                 FirebaseAuth newUser = task.Result;
                 Console.WriteLine("SignInWithEmailAndPasswordAsync success: {0}, {1}", _email, _password);
+
+                user.SetId(newUser.User.LocalId);
+
+                int timeout = _rememberMe ? 525600 : 1;  //525600 min = 1 year
+                var ticket = new FormsAuthenticationTicket(_email, _rememberMe, timeout);
+                string encrypted = FormsAuthentication.Encrypt(ticket);
+                var cookie = new HttpCookie(FormsAuthentication.FormsCookieName, encrypted);
+                cookie.Expires = DateTime.Now.AddMinutes(timeout);
+                cookie.HttpOnly = true;
+                Response.Cookies.Add(cookie);
+
+
                 //System.Diagnostics.Debug.WriteLine("Logged in as " + newUser.User.LocalId);
                 user = Util.FirebaseHelper.GetUser(newUser.User.LocalId);
                 //System.Diagnostics.Debug.WriteLine("User is " + user.GetId());
-
             }).ConfigureAwait(false);
-            System.Threading.Thread.Sleep(3000); // Needed for SignInWithEmailAndPasswordAsync to finish
+
             if (user.GetId().Equals("###"))
             {
                 TempData["InvalidLogin"] = true;
@@ -69,10 +97,18 @@ namespace PittClubManager.Controllers
         }
 
         [HttpPost]
-        public ActionResult Register(FormCollection formCollection)
+        public async Task<ActionResult> Register(FormCollection formCollection)
         {
             _email = formCollection["register-email"];
             _password = formCollection["register-password"];
+            _firstName = formCollection["register-fName"];
+            _lastName = formCollection["register-lName"];
+            if (formCollection["register-remember"] == null)
+                _rememberMe = false;
+            else
+                _rememberMe = true;
+
+            Console.WriteLine("rememberMe: {0}", _rememberMe);
             var confirm_password = formCollection["confirm-password"];
 
             if(!(_password.Equals(confirm_password)))
@@ -84,7 +120,7 @@ namespace PittClubManager.Controllers
             firebase = new FirebaseClient("https://pitt-club-manager.firebaseio.com");
             authProvider = new FirebaseAuthProvider(new FirebaseConfig("AIzaSyCN8Av2-nfNtsRdlWaZiaejPdwQ4QqA38c"));
 
-            authProvider.CreateUserWithEmailAndPasswordAsync(_email, _password).ContinueWith(task =>
+            await authProvider.CreateUserWithEmailAndPasswordAsync(_email, _password).ContinueWith(async task =>
             {
                 if (task.IsCanceled)
                 {
@@ -100,11 +136,41 @@ namespace PittClubManager.Controllers
                 FirebaseAuth newUser = task.Result;
                 Console.WriteLine("CreateUserWithEmailAndPasswordAsync success: {0}, {1}", _email, _password);
 
+                var db = FirestoreDb.Create(DB_NAME);
+                DocumentReference docRef = db.Collection(COLLECTION_USERS).Document(newUser.User.LocalId);
+                Dictionary<string, object> map = new Dictionary<string, object>
+                {
+                    { "firstName", _firstName } ,
+                    { "lastName", _lastName }
+                };
+                await docRef.SetAsync(map).ContinueWith(t => {
+                    if (t.IsCanceled)
+                    {
+                        Console.WriteLine("SetAsync was canceled.");
+                        return;
+                    }
+                    if (t.IsFaulted)
+                    {
+                        Console.WriteLine("SetAsync encountered an error: " + t.Exception);
+                        return;
+                    }
+                    Console.WriteLine("SetAsync success");
+                });
+
                 user.SetId(newUser.User.LocalId);
 
+                int timeout = _rememberMe ? 525600 : 1;  //525600 min = 1 year
+                var ticket = new FormsAuthenticationTicket(_email, _rememberMe, timeout);
+                string encrypted = FormsAuthentication.Encrypt(ticket);
+                var cookie = new HttpCookie(FormsAuthentication.FormsCookieName, encrypted);
+                cookie.Expires = DateTime.Now.AddMinutes(timeout);
+                cookie.HttpOnly = true;
+                Response.Cookies.Add(cookie);
 
-            });
-            System.Threading.Thread.Sleep(1500); // Needed for CreateUserWithEmailAndPasswordAsync to finish
+
+            }).ConfigureAwait(false);
+
+            System.Threading.Thread.Sleep(1000);
 
             if (user.GetId().Equals("###"))
             {
@@ -113,6 +179,12 @@ namespace PittClubManager.Controllers
             }
 
             return RedirectToAction("Index", "Home");
+        }
+
+        public ActionResult Logout()
+        {
+            FormsAuthentication.SignOut();
+            return RedirectToAction("Index", "Login");
         }
     }
 }

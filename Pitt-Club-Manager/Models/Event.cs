@@ -6,14 +6,14 @@ namespace PittClubManager.Models
         private string id;
         private DateTime start;
         private string name;
-        private string description;
+        private string location;
 
-        public Event(string id, DateTime start, string name, string description)
+        public Event(string id, DateTime start, string name, string location)
         {
             this.id = id;
             this.start = start;
             this.name = name;
-            this.description = description;
+            this.location = location;
         }
 
         public string GetId() {
@@ -40,12 +40,12 @@ namespace PittClubManager.Models
             this.name = name;
         }
 
-        public string GetDescription() {
-            return description;
+        public string GetLocation() {
+            return location;
         }
 
-        public void SetDescription(string description) {
-            this.description = description;
+        public void SetLocation(string location) {
+            this.location = location;
         }
     }
 }
