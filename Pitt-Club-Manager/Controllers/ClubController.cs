@@ -56,6 +56,14 @@ namespace PittClubManager.Controllers
             //return View("SAMPLE_CLUB", c);
         }
 
+        public ActionResult Approve(string uid)
+        {
+            Models.User curUser = (Models.User)Session["CurUser"];
+            var b = FirebaseHelper.ApproveJoinClub(uid, (string)Session["ClubId"]).Result;
+
+            return RedirectToAction("Id", "Club", new { id = (string)Session["ClubId"] });
+        }
+
         public ActionResult Id(String id)
         {
             // todo: this should eventually fetch the club from the db by id
@@ -74,6 +82,7 @@ namespace PittClubManager.Controllers
             TempData["CurUserInClub"] = false;
             TempData["UserLoggedIn"] = false;
             TempData["CurUserPendingApproval"] = false;
+            TempData["CurUserIsManager"] = false;
             Models.User curUser = (Models.User)Session["CurUser"];
             // check if the user is logged in. If they are logged in, check if they are in the club
             // if they are in the club, they should be able to see everything. Otherwise, there should be a button to request to join
@@ -82,6 +91,7 @@ namespace PittClubManager.Controllers
                 TempData["UserLoggedIn"] = true;
                 TempData["CurUserInClub"] = FirebaseHelper.UserInClub(curUser.GetId(), id);
                 TempData["CurUserPendingApproval"] = FirebaseHelper.UserPendingClubApproval(curUser.GetId(), id);
+                TempData["CurUserIsManager"] = FirebaseHelper.UserIsManager(curUser.GetId(), id);
             }
             return View("Id", c);
         }

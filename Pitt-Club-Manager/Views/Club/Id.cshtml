@@ -25,7 +25,17 @@
 	<ul>
 		@foreach (var member in Model.GetMemberRequests())
 		{
-			<li>@member.GetId(): @member.GetFirstName() @member.GetLastName()</li>
+		<li>
+			@member.GetId(): @member.GetFirstName() @member.GetLastName()
+			@if ((bool)TempData["CurUserIsManager"])
+			{
+			<div>
+				Approve:
+			</div>
+			<input type="button" value="Approve member" onclick="location.href='@Url.Action("Approve", "Club", new { uid = member.GetId() } )'" />
+			}
+		</li>
+
 		}
 	</ul>
 </div>

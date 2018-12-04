@@ -110,14 +110,87 @@ namespace PittClubManager.Util
 
         }
 
-        public static void ApproveJoinClub(string uid, string cid)
+        public async static Task<bool> ApproveJoinClub(string uid, string cid)
         {
+            FirebaseClient firebase = new FirebaseClient(FIREBASE_URL);
+            var authProvider = new FirebaseAuthProvider(new FirebaseConfig(WEB_KEY));
+            ArrayList clubList = new ArrayList();
+            await authProvider.SignInWithEmailAndPasswordAsync(EMAIL, PASSWORD).ContinueWith(async task =>
+            {
+                if (task.IsCanceled)
+                {
+                    System.Console.WriteLine("SignInWithEmailAndPasswordAsync was canceled.");
+                    return;
+                }
+                if (task.IsFaulted)
+                {
+                    System.Console.WriteLine("SignInWithEmailAndPasswordAsync encountered an error: " + task.Exception);
+                    return;
+                }
+            }).ConfigureAwait(false);
 
+            // step 1: remove request from membership requests
+            System.Diagnostics.Debug.WriteLine("Removing " + uid + " from membership requests!");
+            var db = FirestoreDb.Create(DB_NAME);
+            DocumentReference docRef = db.Collection("clubs").Document(cid);
+            Club curClub = GetClub(cid).Result;
+
+            //recreate member requests with new uid
+            Models.User[] memberRequests = curClub.GetMemberRequests();
+            foreach (var item in memberRequests)
+            {
+
+                System.Diagnostics.Debug.WriteLine("Mem requests: " + item.GetId());
+            }
+            System.Diagnostics.Debug.WriteLine("Mem requests: " + memberRequests.Length.ToString());
+            string[] newMemRequests = new string[memberRequests.Length-1];
+            int i = 0;
+            int j = 0;
+            for (i = 0; i < memberRequests.Length; i++)
+            {
+                if(memberRequests[i].GetId() != uid)
+                {
+                    newMemRequests[j] = memberRequests[i].GetId();
+                    j++;
+                }
+            }
+            System.Diagnostics.Debug.WriteLine("New requests: " + newMemRequests.Length.ToString());
+            foreach (var item in newMemRequests)
+            {
+
+                System.Diagnostics.Debug.WriteLine("New mem requests: " + item);
+            }
+            Dictionary<FieldPath, object> updates = new Dictionary<FieldPath, object>
+            {
+                { new FieldPath("memberIds"), 1},
+            };
+            Google.Cloud.Firestore.WriteResult writeResult = await docRef.UpdateAsync("memberRequests", newMemRequests);
+
+            // step 2: add to member list
+            System.Diagnostics.Debug.WriteLine("Adding " + uid + " to members requests!");
+
+            //recreate member requests with new uid
+            Models.User[] memberIds = curClub.GetMembers();
+            String[] newMembers = new String[memberIds.Length + 1];
+            for (i = 0; i < memberIds.Length; i++)
+            {
+                newMembers[i] = memberIds[i].GetId();
+            }
+            newMembers[i] = uid;
+            writeResult = await docRef.UpdateAsync("memberIds", newMembers);
+
+            return true;
         }
 
         public static void DenyJoinClub(string uid, string cid)
         {
 
+        }
+
+        public static bool UserIsManager(string uid, string cid)
+        {
+            Club curClub = GetClub(cid).Result;
+            return curClub.GetManager().GetId() == uid;
         }
 
         public static async Task<ArrayList> GetClubList()
