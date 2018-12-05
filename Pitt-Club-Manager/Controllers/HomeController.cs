@@ -21,8 +21,7 @@ namespace PittClubManager.Controllers
     {
         public ActionResult Index()
         {
-            ArrayList x = new ArrayList();
-            x = FirebaseHelper.GetClubList().Result;
+            ArrayList x = FirebaseHelper.GetClubList();
             ViewBag.length = x.Count;
             //ViewBag.user = FirebaseHelper.GetUser()
             Models.User curUser = (Models.User)Session["CurUser"];
