@@ -278,7 +278,7 @@ namespace PittClubManager.Util
             return (PittClubManager.Models.User[]) users.ToArray(typeof(PittClubManager.Models.User));
         }
 
-        public static void CreateClub(String clubName, String description, String managerId)
+        public static void CreateClub(String clubName, String description, String filter, String email, String managerId)
         {
             FirebaseClient firebase = new FirebaseClient(FIREBASE_URL);
             var authProvider = new FirebaseAuthProvider(new FirebaseConfig(WEB_KEY));
@@ -288,7 +288,9 @@ namespace PittClubManager.Util
             var result = db.Collection(COLLECTION_PENDING_CLUBS).AddAsync(new Dictionary<String, String>()
             {
                 {"name", clubName},
+                {"filter", filter},
                 {"description", description},
+                {"email", email},
                 {"managerId", managerId}
             }).Result;
         }
@@ -323,7 +325,8 @@ namespace PittClubManager.Util
                         {"name", snap.GetValue<string>("name")},
                         {"description", snap.GetValue<string>("description")},
                         {"managerId", snap.GetValue<string>("managerId")},
-                        {"filter", "THIS NEEDS TO BE IMPLEMENTED"},
+                        {"filter", snap.GetValue<string>("filter")},
+                        {"email", snap.GetValue<string>("email")},
                         {"eventIds", new string[0]},
                         {"memberIds",new string[0]}
                     }).Result;
@@ -422,6 +425,7 @@ namespace PittClubManager.Util
             c.SetName(snap.GetValue<string>("name"));
             c.SetId(snap.Id);
             c.SetDescription(snap.GetValue<string>("description"));
+            c.SetFilter(snap.GetValue<string>("filter"));
             String managerId = snap.GetValue<string>("managerId");
             PittClubManager.Models.User manager = GetUser(managerId);
             c.SetManager(manager);
