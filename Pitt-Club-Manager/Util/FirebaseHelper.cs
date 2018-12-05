@@ -194,40 +194,19 @@ namespace PittClubManager.Util
             return curClub.GetManager().GetId() == uid;
         }
 
-        public static async Task<ArrayList> GetClubList()
+        public static ArrayList GetClubList()
         {
             FirebaseClient firebase = new FirebaseClient(FIREBASE_URL);
             var authProvider = new FirebaseAuthProvider(new FirebaseConfig(WEB_KEY));
-            ArrayList clubList = new ArrayList();
-            await authProvider.SignInWithEmailAndPasswordAsync(EMAIL, PASSWORD).ContinueWith(async task =>
-            {
-                if (task.IsCanceled)
-                {
-                    System.Console.WriteLine("SignInWithEmailAndPasswordAsync was canceled.");
-                    return;
-                }
-                if (task.IsFaulted)
-                {
-                    System.Console.WriteLine("SignInWithEmailAndPasswordAsync encountered an error: " + task.Exception);
-                    return;
-                }
-            }).ConfigureAwait(false);
-            var db = FirestoreDb.Create(DB_NAME);
-            IAsyncEnumerable<DocumentSnapshot> clubRef = db.Collection(COLLECTION_CLUBS).StreamAsync();
-            int i = 0;
-            var enumerator = clubRef.GetEnumerator();
-            while (await enumerator.MoveNext())
-            {
-                //System.Diagnostics.Debug.WriteLine("Found item " + i + "!");
-                //System.Diagnostics.Debug.WriteLine(enumerator.Current.Id);
-
-                //System.Diagnostics.Debug.WriteLine("Attempting to add club " + enumerator.Current.Id + "!");
-                clubList.Add(GetClub(enumerator.Current.Id).Result);
-                //System.Diagnostics.Debug.WriteLine("Added club " + clubList[i] + "!");
-                i++;
+            FirebaseAuthLink res = authProvider.SignInWithEmailAndPasswordAsync(EMAIL, PASSWORD).Result;
+            FirestoreDb db = FirestoreDb.Create(DB_NAME);
+            QuerySnapshot snap = db.Collection(COLLECTION_CLUBS).GetSnapshotAsync().Result;
+            ArrayList clubs = new ArrayList();
+            foreach (var doc in snap.Documents)
+            {                       
+                clubs.Add(FirebaseSnapshotToClub(doc));
             }
-            System.Diagnostics.Debug.WriteLine("Returning a club list with capacity " + clubList.Capacity + "!");
-            return clubList;
+            return clubs;
         }
 
         public static bool UserInClub(string uid, string cid)
