@@ -20,5 +20,12 @@ namespace PittClubManager.Controllers
             FirebaseHelper.ApproveClub(id);
             return View();
         }
+
+        public ActionResult CreateClub(FormCollection formCollection) {
+            // todo: will be able to get user id from session
+            FirebaseHelper.CreateClub(formCollection["name"], formCollection["description"], "todo: implement");
+            return RedirectToAction("Index", "Superuser");
+        }
+
     }
 }
