@@ -89,7 +89,15 @@
                     <p>Welcome to Pitt's club manager.  This is the place to keep track of all of the clubs you are in!  Click a club's check box to join.  Visit the club's homepage to learn more.</p>
                 </div>
             </div>
-
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                    </div>
+                    <div class="col-md-6 text-right">
+                        <button class="btn btn-primary pull-right" onclick="location.href='/CreateClub'">Create club</button>
+                    </div>
+               </div>
+            </div>
 
             <div class="container" id="club-list">
                 @for (var i = 0; i <= @ViewBag.length - 1; i++)

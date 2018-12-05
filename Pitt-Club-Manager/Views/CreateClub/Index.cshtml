@@ -1,26 +1,6 @@
-﻿<!DOCTYPE html>
-<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-<link href="~/Content/login-register.css" rel="stylesheet" />
+﻿<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<link href="~/Content/create-club.css" rel="stylesheet" />
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
-<html>
-<head>
-    <title>CreateClub</title>
-    <meta charset="utf-8" />
-</head>
-<body>
-    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-        <a href="@Url.Action("Logout", "Login")">Logout</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-            <ul class="navbar-nav mr-auto">
-                <li class="navbar-text" style="padding: .5rem">
-                    @HttpContext.Current.User.Identity.Name
-                </li>
-            </ul>
-        </div>
-    </nav>
     <h1>Create Club</h1>
     <div class="panel-body" id="create-club">
         @if(@Model)
@@ -57,5 +37,3 @@
             </div>
         </div>
     </div>
-</body>
-</html>
