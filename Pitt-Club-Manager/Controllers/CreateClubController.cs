@@ -38,7 +38,7 @@ namespace PittClubManager.Controllers
 
             if (user != null && user.GetId() != "###")
             {
-                FirebaseHelper.CreateClub(collection["name"], collection["description"], user.GetId());
+                FirebaseHelper.CreateClub(collection["name"], collection["description"], collection["filter"], collection["email"], user.GetId());
             }
             return RedirectToAction("Index", new { result = "success" });
         }
