@@ -54,13 +54,9 @@
                             What are your interests?
                         </button>
                         <div class="dropdown-menu" aria-labelledby="dropdown01">
-                            <p class="dropdown-item"><input type="checkbox" id="opt1" value="My Clubs" onchange="filter(this.id, this.checked)" />&nbsp;&nbsp;&nbsp;&nbsp;My Clubs</p>
-                            <p class="dropdown-item"><input type="checkbox" id="opt2" value="Sports" onchange="filter(this.id, this.checked)" />&nbsp;&nbsp;&nbsp;&nbsp;Sports</p>
-                            <p class="dropdown-item"><input type="checkbox" id="opt3" value="Gaming" onchange="filter(this.id, this.checked)" />&nbsp;&nbsp;&nbsp;&nbsp;Gaming</p>
-                            <p class="dropdown-item"><input type="checkbox" id="opt4" value="Academic" onchange="filter(this.id, this.checked)" />&nbsp;&nbsp;&nbsp;&nbsp;Academic</p>
-                            <p class="dropdown-item"><input type="checkbox" id="opt5" value="Newly Added" onchange="filter(this.id, this.checked)" />&nbsp;&nbsp;&nbsp;&nbsp;Newly Added</p>
-                            <p class="dropdown-item"><input type="checkbox" id="opt6" value="Most members" onchange="filter(this.id, this.checked)" />&nbsp;&nbsp;&nbsp;&nbsp;Most members</p>
-                            <p class="dropdown-item"><input type="checkbox" id="opt7" value="Least members" onchange="filter(this.id, this.checked)" />&nbsp;&nbsp;&nbsp;&nbsp;Least members</p>
+                            <p class="dropdown-item"><input type="checkbox" id="opt1" value="Sports" onchange="filter(this.id, this.checked)" />&nbsp;&nbsp;&nbsp;&nbsp;Sports</p>
+                            <p class="dropdown-item"><input type="checkbox" id="opt2" value="Gaming" onchange="filter(this.id, this.checked)" />&nbsp;&nbsp;&nbsp;&nbsp;Gaming</p>
+                            <p class="dropdown-item"><input type="checkbox" id="opt3" value="Academic" onchange="filter(this.id, this.checked)" />&nbsp;&nbsp;&nbsp;&nbsp;Academic</p>
                         </div>
                     </li>
                 </ul>
@@ -72,7 +68,6 @@
                             <li>
                                 <div class="chip">
                                     <a href="@Url.Action("id", "Club", new { id = Model[i].GetId() })">@Model[i].GetName()</a>
-                                    @*@Html.ActionLink(">>", "id", "Club", new { id = Model[i].GetId() }, null)*@
                                 </div>
                             </li>
                         }
@@ -102,22 +97,15 @@
             <div class="container" id="club-list">
                 @for (var i = 0; i <= @ViewBag.length - 1; i++)
                 {
-                    <div class="col-md-4 card" style="float:left; height:350px;">
-                        <h2>@Model[i].GetName()</h2>
-                        <p style="overflow-y:scroll">@Model[i].GetDescription()</p>
-                        <p class="font-weight-bold font-italic">@Model[i].GetFilter()</p>
-
-                        @Html.ActionLink("Club page", "id", "Club", new { id = Model[i].GetId() }, new { @class = "page-scroll" })
-
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text">
-                                    <input type="checkbox">
-                                </div>
-                            </div>
-                            <input type="text" class="form-control" placeholder="Join @Model[i].GetName()" disabled>
-                        </div>
+                <div class="col-md-4 card" style="float:left; height:350px;">
+                    <h2>@Model[i].GetName()</h2>
+                    <p style="overflow-y:scroll">@Model[i].GetDescription()</p>
+                    <div class="input-group mb-3 font-weight-bold font-italic">
+                        <input type="text" class="form-control" placeholder="@Model[i].GetFilter()" disabled>
                     </div>
+
+                    @Html.ActionLink("Club page", "id", "Club", new { id = Model[i].GetId() }, new { @class = "page-scroll" })
+                </div>
                 }
 
                 <hr>

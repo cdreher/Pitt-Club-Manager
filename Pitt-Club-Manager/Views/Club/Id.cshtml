@@ -50,7 +50,7 @@
                             </ul>
                         </div>
                         <div id="memberRequests">
-                            Member requests
+                            <h5>Member Requests:</h5>
                             <ul>
                                 @foreach (var member in Model.GetMemberRequests())
                                 {
@@ -72,9 +72,6 @@
                         <div>
                             @if ((bool)TempData["UserLoggedIn"])
                             {
-                                <div>
-                                    User is logged in.
-                                </div>
                                 if ((bool)TempData["CurUserInClub"])
                                 {
                                     <div>
@@ -97,12 +94,6 @@
                                         </div>
                                     }
                                 }
-                            }
-                            else
-                            {
-                                <div>
-                                    User is not logged in.
-                                </div>
                             }
 
                         </div>
