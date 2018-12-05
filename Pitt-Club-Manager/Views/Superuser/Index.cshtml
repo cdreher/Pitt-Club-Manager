@@ -1,9 +1,7 @@
-﻿<!doctype html>
-<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-<link href="~/Content/login-register.css" rel="stylesheet" />
+﻿<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<link href="~/Content/superuser.css" rel="stylesheet" />
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
-<html lang="en">
-<body>
+<div class="container">
     <h1>Superuser</h1>
     <div id="pendingClubs">
         <h2>Pending Clubs</h2>
@@ -11,12 +9,25 @@
         {
             <div>No pending clubs</div>
         }
-        <ul>
-            @foreach (var c in Model)
-            {
-                <li><span>@c.GetId() - @c.GetName() - @c.GetDescription() - @c.GetManager().GetFirstName() - @c.GetManager().GetLastName()</span><a href="@Url.Action("ApproveClub", "Superuser",  new { id = c.GetId()})">Approve</a></li>
-            }
-        </ul>
+        <table class="table">
+            <thead>
+            <th scope="col">ID</th>
+            <th scope="col">Name</th>
+            <th scope="col">Description</th>
+            <th scope="col">Manager</th>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        <td>@c.GetId()</td>
+                        <td>@c.GetName()</td>
+                        <td>@c.GetDescription()</td>
+                        <td>@c.GetManager().GetFirstName() @c.GetManager().GetLastName()</td>
+                        <td><a href="@Url.Action("ApproveClub", "Superuser",  new { id = c.GetId()})">Approve</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
-</body>
-</html>
+</div>
